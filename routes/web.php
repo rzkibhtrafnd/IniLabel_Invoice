@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,18 +15,17 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
+// Redirect root URL to login route
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
-// Route Auth
+// Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Middleware untuk masing-masing role
-
+// Middleware for authenticated users
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
 });
