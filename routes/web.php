@@ -15,20 +15,14 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-// Redirect root URL to login route
-Route::get('/', function () {
-    return inertia('Home');
+Route::get('/login', function () {
+    return redirect()->route('home');
 });
-// Route::get('/', function () {
-//     return redirect()->route('login');
-// });
 
-// Authentication Routes
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', [AuthController::class, 'index'])->name('home');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// Middleware for authenticated users
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });

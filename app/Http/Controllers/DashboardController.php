@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function adminIndex()
+    public function index()
     {
-        return view('admin.dashboard');
+        return Inertia::render('Dashboard', [
+            'canCreateUser' => Auth::user()->can('create-user'),
+        ]);
     }
 }

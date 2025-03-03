@@ -4,31 +4,43 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function index(): Response
     {
-        return view('auth.login');
+        if (!Auth::check()) {
+            return Inertia::render('Login');
+        }
+
+        return Inertia::render('Dashboard', [
+            'canCreateUser' => Auth::user()->can('create-user')
+        ]);
     }
 
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required'
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect()->route('admin.dashboard');
+            $request->session()->regenerate();
+            return redirect()->intended(route('dashboard'));
         }
 
-        return back()->withErrors(['email' => 'Email atau password salah']);
+        return back()->withErrors(['email' => 'Email atau password salah.']);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        return redirect()->route('login');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }
