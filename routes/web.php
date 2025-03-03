@@ -17,8 +17,11 @@ use App\Http\Controllers\DashboardController;
 
 // Redirect root URL to login route
 Route::get('/', function () {
-    return redirect()->route('login');
+    return inertia('Home');
 });
+// Route::get('/', function () {
+//     return redirect()->route('login');
+// });
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
