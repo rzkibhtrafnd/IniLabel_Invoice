@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        return response()->json([
-            'users' => User::all()
-        ]);
+        $users = User::all(['id', 'username', 'email']);
+
+        return Inertia::render('Users/Index', compact('users'));
     }
 
     public function store(Request $request)

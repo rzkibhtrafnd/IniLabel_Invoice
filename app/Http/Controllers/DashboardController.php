@@ -10,8 +10,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Dashboard', [
-            'canCreateUser' => Auth::user()->can('create-user'),
+        return Inertia::render('Dashboard/Index', [
+            'canManageUser' => Auth::user()->can('manage-user'),
         ]);
     }
 }
