@@ -11,13 +11,7 @@ class AuthController extends Controller
 {
     public function index(): Response
     {
-        if (!Auth::check()) {
-            return Inertia::render('Login');
-        }
-
-        return Inertia::render('Dashboard', [
-            'canCreateUser' => Auth::user()->can('create-user')
-        ]);
+        return Inertia::render('Login');
     }
 
     public function login(Request $request)
