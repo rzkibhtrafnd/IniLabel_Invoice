@@ -1,4 +1,4 @@
-import { useForm, usePage, Link } from "@inertiajs/react";
+import { usePage, Link } from "@inertiajs/react";
 import { FaBars } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -6,17 +6,18 @@ import { GoPeople } from "react-icons/go";
 import { IoBagRemoveOutline, IoLogOutOutline } from "react-icons/io5";
 import { PiInvoice } from "react-icons/pi";
 import { TfiReceipt } from "react-icons/tfi";
+import logo from "../../assets/logo.png";
 
 function MenuItem({ href, icon: Icon, label, isActive }) {
   return (
     <li>
       <Link
         href={href}
-        className={`flex gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white ${
+        className={`flex text-xl gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white ${
           isActive ? "bg-primary text-white" : ""
         }`}
       >
-        <Icon className="text-xl" />
+        <Icon size={30} />
         {label}
       </Link>
     </li>
@@ -37,14 +38,20 @@ export default function Header() {
   ];
 
   return (
-    <header className="relative flex justify-between p-4 bg-white shadow-md">
+    <header className="relative flex justify-between p-4 pt-10 bg-white shadow-md">
       <h1 className="md:hidden text-lg font-bold">IniLabel</h1>
       <button className="md:hidden text-2xl">
         <FaBars />
       </button>
 
-      <nav className="hidden md:flex flex-col absolute md:static">
-        <ul className="flex flex-col gap-3">
+      <nav className="hidden md:flex flex-col gap-6 absolute md:static">
+        <img
+          src={logo}
+          alt="Logo"
+          className="px-4"
+          width={180} height={180}
+        />
+        <ul className="flex flex-col gap-2">
           {menuItems.map(({ href, icon, label, isShow }) =>
             isShow !== false ? (
               <MenuItem key={href} href={href} icon={icon} label={label} isActive={component.includes(label)} />
@@ -54,9 +61,9 @@ export default function Header() {
             <Link
               href="/logout"
               method="post"
-              className="flex w-full cursor-pointer gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white"
+              className="flex w-full text-xl cursor-pointer gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white"
             >
-              <IoLogOutOutline className="text-xl" />
+              <IoLogOutOutline size={30} />
               Logout
             </Link>
           </li>

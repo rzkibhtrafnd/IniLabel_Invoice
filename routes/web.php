@@ -15,9 +15,5 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    Route::middleware(['superadmin'])->group(function () {
-        Route::resource('/users', AdminController::class);
-    });
-    
+    Route::resource('users', AdminController::class)->middleware('superadmin');
 });

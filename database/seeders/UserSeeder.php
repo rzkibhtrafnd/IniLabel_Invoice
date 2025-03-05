@@ -6,11 +6,14 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Faker\Factory as Faker;
 
 class UserSeeder extends Seeder
 {
     public function run()
     {
+        $faker = Faker::create();
+
         $users = [
             [
                 'id' => Str::uuid(),
@@ -42,8 +45,16 @@ class UserSeeder extends Seeder
             ],
         ];
 
-        foreach ($users as $user) {
-            User::create($user);
+        for ($i = 0; $i < 10; $i++) {
+            $users[] = [
+                'id' => Str::uuid(),
+                'username' => $faker->userName,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('password'),
+                'role' => 'user',
+            ];
         }
+
+        User::insert($users);
     }
 }
