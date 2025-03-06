@@ -17,7 +17,7 @@ function MenuItem({ href, icon: Icon, label, isActive }) {
           isActive ? "bg-primary text-white" : ""
         }`}
       >
-        <Icon size={30} />
+      <Icon size={30} />
         {label}
       </Link>
     </li>
