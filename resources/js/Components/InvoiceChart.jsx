@@ -5,11 +5,11 @@ ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip,
 
 export default function InvoiceChart() {
   const data = {
-    labels: Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`),
+    labels: Array.from({ length: 12 }, (_, i) => `${(i + 1) * 5}K`),
     datasets: [
       {
         label: "Invoice Percentage",
-        data: [20, 30, 25, 40, 35, 50, 55, 45, 60, 64, 48, 50, 70, 65, 55, 75, 80, 72, 68, 90, 85, 78, 92, 88, 79, 95, 98, 85, 90, 100],
+        data: [20, 30, 25, 40, 35, 50, 55, 45, 60, 64, 48, 50],
         borderColor: "#007bff",
         borderWidth: 2,
         pointRadius: 3,
@@ -36,7 +36,7 @@ export default function InvoiceChart() {
         ticks: {
           stepSize: 20,
           callback: (value) => `${value}%`,
-          padding: 30, // Perbaikan padding
+          padding: 25,
         },
         grid: {
           drawTicks: false,
@@ -50,7 +50,7 @@ export default function InvoiceChart() {
       },
       x: {
         ticks: {
-          padding: 30, // Perbaikan padding
+          padding: 25,
         },
         grid: {
           drawTicks: false,
