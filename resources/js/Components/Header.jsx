@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { usePage, Link } from "@inertiajs/react";
+import { usePage, Link, useForm } from "@inertiajs/react";
 import { FaBars } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
 import { IoBagRemoveOutline, IoLogOutOutline } from "react-icons/io5";
@@ -47,6 +47,13 @@ export default function Header() {
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isOpen]);
 
+  const { post, processing } = useForm();
+
+  function handleLogout(e) {
+    e.preventDefault();
+    post("/logout");
+  }
+
   const menuItems = [
     { href: "/dashboard", icon: RxDashboard, label: "Dashboard", isShow: true, componentName: "Dashboard" },
     { href: "/users", icon: HiOutlineUserCircle, label: "User", isShow: canManageUser, componentName: "Users" },
@@ -77,8 +84,10 @@ export default function Header() {
             )}
             <li>
               <Link
-                href="/logout"
-                method="post"
+                as="button"
+                type="button"
+                onClick={handleLogout}
+                disabled={processing}
                 className="flex w-full text-xl cursor-pointer gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white"
               >
                 <IoLogOutOutline size={30} />
