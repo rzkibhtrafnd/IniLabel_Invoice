@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\InvoiceController;
 
 Route::get('/login', function () {
     return redirect()->route('home');
@@ -20,4 +21,5 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', AdminController::class)->middleware('superadmin');
     Route::resource('customers', CustomerController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('invoices', InvoiceController::class);
 });

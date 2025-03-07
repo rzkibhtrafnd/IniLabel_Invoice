@@ -35,6 +35,7 @@ export default function InvoiceChart() {
         max: 100,
         ticks: {
           stepSize: 20,
+          color: "#22272B66",
           callback: (value) => `${value}%`,
           padding: 25,
         },
@@ -51,6 +52,7 @@ export default function InvoiceChart() {
       x: {
         ticks: {
           padding: 25,
+          color: "#22272B66",
         },
         grid: {
           drawTicks: false,

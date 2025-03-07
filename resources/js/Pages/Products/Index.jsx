@@ -61,7 +61,7 @@ export default function Index({ products = [] }) {
     <DashboardLayout>
       <Head title="Products" />
       <Heading title="Data Produk" subTitle="produk">
-        <Button onClick={handleAddProduct}>
+        <Button onClick={handleAddProduct} className="bg-[#01669E]">
           Tambah
           <BsPlusCircle size={24} />
         </Button>
@@ -82,7 +82,7 @@ export default function Index({ products = [] }) {
                 <TableData className="font-bold text-light-slate">
                   {index + 1}
                 </TableData>
-                <TableData>{product.name}</TableData>
+                <TableData className="text-nowrap">{product.name}</TableData>
                 <TableData>
                   {new Intl.NumberFormat("id-ID", {
                     style: "currency",
@@ -90,19 +90,19 @@ export default function Index({ products = [] }) {
                   }).format(product.price)}
                 </TableData>
                 <TableData>{product.stock}</TableData>
-                <TableData>
+                <TableData className="px-1 w-[111px]">
                   <Button onClick={openPopup} className="bg-[#33D1AB] text-[1rem]">
                     Detail
                     <TbSearch size={24} />
                   </Button>
                 </TableData>
-                <TableData>
+                <TableData className="px-1 w-[96px]">
                   <Button onClick={() => handleEditProduct(product)} className="bg-primary text-[1rem]">
                     Edit
                     <TbEdit size={24} />
                   </Button>
                 </TableData>
-                <TableData>
+                <TableData className="px-1 w-[115px]">
                   <Button onClick={() => onDeleteProduct(product.id)} className="bg-[#D30368] text-[1rem]">
                     Hapus
                     <MdOutlineCancel size={24} />
@@ -118,7 +118,7 @@ export default function Index({ products = [] }) {
 
       {isOpen && (
         <Popup>
-          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
+
             <h2 className="text-lg font-bold mb-4">
               {data.id ? "Edit Produk" : "Tambah Produk"}
             </h2>
@@ -182,7 +182,6 @@ export default function Index({ products = [] }) {
                 </button>
               </div>
             </form>
-          </div>
         </Popup>
       )}
     </DashboardLayout>

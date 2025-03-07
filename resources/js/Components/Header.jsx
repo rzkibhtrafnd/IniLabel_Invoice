@@ -1,9 +1,9 @@
+import { useState, useEffect } from "react";
 import { usePage, Link } from "@inertiajs/react";
 import { FaBars } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
-import { FaRegCircleUser } from "react-icons/fa6";
-import { GoPeople } from "react-icons/go";
 import { IoBagRemoveOutline, IoLogOutOutline } from "react-icons/io5";
+import { HiOutlineUserGroup, HiOutlineUserCircle } from "react-icons/hi2";
 import { PiInvoice } from "react-icons/pi";
 import { TfiReceipt } from "react-icons/tfi";
 import logo from "../../assets/logo.png";
@@ -17,7 +17,7 @@ function MenuItem({ href, icon: Icon, label, isActive }) {
           isActive ? "bg-primary text-white" : ""
         }`}
       >
-      <Icon size={30} />
+        <Icon size={30} />
         {label}
       </Link>
     </li>
@@ -26,52 +26,69 @@ function MenuItem({ href, icon: Icon, label, isActive }) {
 
 export default function Header() {
   const { canManageUser } = usePage().props;
-  const { component } = usePage();
+  const { component, url } = usePage();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+  const closeMenu = () => setIsOpen(false);
+
+  useEffect(() => {
+    closeMenu();
+  }, [url]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (e.target.closest("aside")) {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isOpen]);
 
   const menuItems = [
-    { href: "/dashboard", icon: RxDashboard, label: "Dashboard", isShow: true },
-    { href: "/users", icon: FaRegCircleUser, label: "User", isShow: canManageUser },
-    { href: "/customers", icon: GoPeople, label: "Customer", isShow: true },
-    { href: "/products", icon: IoBagRemoveOutline, label: "Produk", isShow: true },
-    { href: "/invoices", icon: PiInvoice, label: "Invoice", isShow: true },
-    { href: "/receipts", icon: TfiReceipt, label: "Receipt", isShow: true },
+    { href: "/dashboard", icon: RxDashboard, label: "Dashboard", isShow: true, componentName: "Dashboard" },
+    { href: "/users", icon: HiOutlineUserCircle, label: "User", isShow: canManageUser, componentName: "Users" },
+    { href: "/customers", icon: HiOutlineUserGroup, label: "Customer", isShow: true, componentName: "Customers" },
+    { href: "/products", icon: IoBagRemoveOutline, label: "Produk", isShow: true, componentName: "Products" },
+    { href: "/invoices", icon: PiInvoice, label: "Invoice", isShow: true, componentName: "Invoices" },
+    { href: "/receipts", icon: TfiReceipt, label: "Receipt", isShow: true, componentName: "Receipts" },
   ];
 
   return (
-    <header className="relative flex justify-between p-4 pt-10 bg-white shadow-md">
-      <h1 className="md:hidden text-lg font-bold">IniLabel</h1>
-      <button className="md:hidden text-2xl">
-        <FaBars />
+    <header className="sticky md:h-[calc(100vh-1rem)] p-4 top-0 left-0 flex bg-white">
+      <button onClick={toggleMenu} className="md:hidden text-[#0569A0] cursor-pointer">
+        <FaBars size={24} />
       </button>
 
-      <nav className="hidden md:flex flex-col gap-6 absolute md:static">
-        <img
-          src={logo}
-          alt="Logo"
-          className="px-4"
-          width={180} height={180}
-        />
-        <ul className="flex flex-col gap-2">
-          {menuItems.map(({ href, icon, label, isShow }) =>
-            isShow !== false ? (
-              <MenuItem key={href} href={href} icon={icon} label={label} isActive={component.includes(label)} />
-            ) : null
-          )}
-          <li>
-            <Link
-              href="/logout"
-              method="post"
-              className="flex w-full text-xl cursor-pointer gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white"
-            >
-              <IoLogOutOutline size={30} />
-              Logout
-            </Link>
-          </li>
-        </ul>
-        <p className="text-center mt-auto text-sm">
-          &copy;2025 IniLabel
-        </p>
-      </nav>
+      <aside
+        className={`fixed md:static w-full bg-[#ffffff50] top-0 transition-all duration-300 ${
+          isOpen ? "left-0" : "left-[-100%]"
+        } md:left-0`}
+      >
+        <nav className="flex flex-col gap-8 w-fit bg-white h-[calc(100vh)] p-[1rem]">
+          <img src={logo} alt="Logo" className="px-4" width={180} height={180} />
+          <ul className="flex flex-col gap-2">
+            {menuItems.map(({ href, icon, label, isShow, componentName }) =>
+              isShow !== false ? (
+                <MenuItem key={href} href={href} icon={icon} label={label} isActive={component.includes(componentName)} />
+              ) : null
+            )}
+            <li>
+              <Link
+                href="/logout"
+                method="post"
+                className="flex w-full text-xl cursor-pointer gap-3 py-2 px-4 rounded-md items-center hover:bg-primary hover:text-white"
+              >
+                <IoLogOutOutline size={30} />
+                Logout
+              </Link>
+            </li>
+          </ul>
+          <p className="text-center mt-auto text-sm">&copy;2025 IniLabel</p>
+        </nav>
+      </aside>
     </header>
   );
 }

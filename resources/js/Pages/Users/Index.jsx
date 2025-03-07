@@ -59,7 +59,7 @@ export default function Index({ users = [] }) {
     <DashboardLayout>
       <Head title="Users" />
       <Heading title="Data User" subTitle="user">
-        <Button onClick={handleAddUser}>
+        <Button onClick={handleAddUser} className="bg-[#01669E]">
           Tambah
           <BsPlusCircle size={24} />
         </Button>
@@ -79,21 +79,21 @@ export default function Index({ users = [] }) {
                 <TableData className="font-bold text-light-slate">
                   {index + 1}
                 </TableData>
-                <TableData>{user.username}</TableData>
+                <TableData className="text-nowrap">{user.username}</TableData>
                 <TableData>{user.email}</TableData>
-                <TableData>
+                <TableData className="px-1 w-[111px]">
                   <Button onClick={openPopup} className="bg-[#33D1AB] text-[1rem]">
                     Detail
                     <TbSearch size={24} />
                   </Button>
                 </TableData>
-                <TableData>
+                <TableData className="px-1 w-[96px]">
                   <Button onClick={() => handleEditUser(user)} className="bg-primary text-[1rem]">
                     Edit
                     <TbEdit size={24} />
                   </Button>
                 </TableData>
-                <TableData>
+                <TableData className="px-1 w-[115px]">
                   <Button onClick={() => onDeleteUser(user.id)} className="bg-[#D30368] text-[1rem]">
                     Hapus
                     <MdOutlineCancel size={24} />
@@ -109,7 +109,6 @@ export default function Index({ users = [] }) {
 
       {isOpen && (
         <Popup>
-          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
             <h2 className="text-lg font-bold mb-4">{data.id ? "Edit User" : "Tambah User"}</h2>
             <form onSubmit={handleSubmit}>
               <input type="hidden" id="id" value={data.id} />
@@ -161,7 +160,6 @@ export default function Index({ users = [] }) {
                 </button>
               </div>
             </form>
-          </div>
         </Popup>
       )}
     </DashboardLayout>

@@ -1,4 +1,7 @@
 import { Head, router, useForm } from "@inertiajs/react";
+import logo from "../../../assets/logo.png";
+import Button from "../../Components/Buttons";
+import Input from "../../Components/Input";
 
 export default function Login() {
   const { data, reset, setData, processing } = useForm({
@@ -18,48 +21,52 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center">
       <Head title="Login" />
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-700 mb-4">
+      <div className="w-full gap-4 flex flex-col bg-[#F6F6F6] border border-[#5882C1] max-w-md p-10 rounded-lg">
+        <img
+          src={logo}
+          alt="Logo"
+          className="mx-auto"
+          width={180} height={180}
+        />
+        <h1 className="text-2xl font-bold mb-4">
           Login
-        </h2>
+        </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+            <label htmlFor="email" className="block text-base font-medium mb-1">
               Email
             </label>
-            <input
-              id="email"
+            <Input
+              name="email"
               type="email"
-              value={data.email}
               onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400"
-              placeholder="Enter your email"
+              value={data.email}
+              placeholder="Email"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+            <label htmlFor="password" className="block text-base font-medium mb-1">
               Password
             </label>
-            <input
-              id="password"
+            <Input
+              name="password"
               type="password"
-              value={data.password}
               onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400"
-              placeholder="Enter your password"
+              value={data.password}
+              placeholder="Password"
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={processing}
-            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-400 transition duration-300"
+            className="w-full flex justify-center text-center bg-[#003465] rounded-lg transition duration-300"
           >
             {processing ? "Logging in..." : "Login"}
-          </button>
+          </Button>
         </form>
       </div>
     </div>
