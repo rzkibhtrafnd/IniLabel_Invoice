@@ -10,16 +10,12 @@ import { BsPlusCircle } from "react-icons/bs";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { MdOutlineCancel } from "react-icons/md";
 
-const items = [
-  {
-    id: 'iaudgbviad7yv98y',
-    name: 'Titis Fajar',
-    price: 'Rp 3.000.000',
-    status: 'Failed',
-  },
-];
+export default function Invoice({ invoices }) {
+  // Fungsi untuk memformat angka ke dalam format mata uang
+  const formatCurrency = (value) => {
+    return `Rp ${value.toLocaleString()}`;
+  };
 
-export default function Invoice({ invoices = items }) {
   return (
     <DashboardLayout>
       <Head title="Invoices" />
@@ -32,7 +28,7 @@ export default function Invoice({ invoices = items }) {
         </Link>
       </Heading>
 
-      {invoices.length > 0 ? (
+      {invoices.data.length > 0 ? (
         <Table>
           <TableHead>
             <TableHeader>Id</TableHeader>
@@ -42,39 +38,59 @@ export default function Invoice({ invoices = items }) {
             <TableHeader colSpan={3}>Aksi</TableHeader>
           </TableHead>
           <tbody>
-            {invoices.map((invoices) => (
-              <tr key={invoices.id}>
+            {invoices.data.map((invoice) => (
+              <tr key={invoice.id}>
                 <TableData className="font-bold text-light-slate">
-                  {invoices.id}
+                  {invoice.id}
                 </TableData>
-                <TableData className="text-nowrap">{invoices.name}</TableData>
-                <TableData>{invoices.price}</TableData>
-                <TableData>{invoices.status}</TableData>
+                <TableData className="text-nowrap">
+                  {invoice.customer.name} {/* Menampilkan nama customer */}
+                </TableData>
+                <TableData>
+                  {formatCurrency(invoice.total_bayar)} {/* Format total harga */}
+                </TableData>
+                <TableData>{invoice.status}</TableData>
                 <TableData className="px-1 w-[111px]">
-                  <Button className="bg-[#33D1AB] text-[1rem]">
-                    Detail
-                    <TbSearch size={24} />
-                  </Button>
+                  <Link href={`/invoices/${invoice.id}`}>
+                    <Button className="bg-[#33D1AB] text-[1rem]">
+                      Detail
+                      <TbSearch size={24} />
+                    </Button>
+                  </Link>
                 </TableData>
                 <TableData className="px-1 w-[96px]">
-                  <Button className="bg-primary text-[1rem]">
-                    Edit
-                    <TbEdit size={24} />
-                  </Button>
+                  <Link href={`/invoices/${invoice.id}/edit`}>
+                    <Button className="bg-primary text-[1rem]">
+                      Edit
+                      <TbEdit size={24} />
+                    </Button>
+                  </Link>
                 </TableData>
                 <TableData className="px-1 w-[115px]">
-                  <Button className="bg-[#D30368] text-[1rem]">
-                    Hapus
-                    <MdOutlineCancel size={24} />
-                  </Button>
+                  <Link
+                    href={`/invoices/${invoice.id}`}
+                    method="delete"
+                    as="button"
+                    onBefore={() => {
+                      if (!confirm("Apakah Anda yakin ingin menghapus invoice ini?")) {
+                        return false;
+                      }
+                    }}
+                  >
+                    <Button className="bg-[#D30368] text-[1rem]">
+                      Hapus
+                      <MdOutlineCancel size={24} />
+                    </Button>
+                  </Link>
                 </TableData>
               </tr>
             ))}
           </tbody>
         </Table>
       ) : (
-        <p className="text-center text-gray-500 mt-4">Tidak ada data customer.</p>
+        <p className="text-center text-gray-500 mt-4">Tidak ada data invoice.</p>
       )}
+
     </DashboardLayout>
   );
 }

@@ -4,12 +4,16 @@ import { Head, Link } from "@inertiajs/react";
 import { IoIosArrowBack } from "react-icons/io";
 import Table from "../../Components/Tables/Table";
 import { MdOutlineCancel } from "react-icons/md";
+import { router } from "@inertiajs/react"; // Import router dari Inertia
 
 export default function Invoice({ products = [], customers = [] }) {
   const [rows, setRows] = useState([{ item: "", qty: 1, total: 0 }]);
   const [discount, setDiscount] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [tax, setTax] = useState(0);
+  const [paymentStatus, setPaymentStatus] = useState("Belum dibayar"); // State untuk status pembayaran
+  const [selectedCustomer, setSelectedCustomer] = useState(""); // State untuk customer yang dipilih
+  const [dueDate, setDueDate] = useState(""); // State untuk jatuh tempo
 
   const productPrices = products.reduce((acc, product) => {
     acc[product.name] = product.price;
@@ -39,6 +43,39 @@ export default function Invoice({ products = [], customers = [] }) {
   const subtotal = rows.reduce((sum, row) => sum + row.total, 0);
   const total = subtotal - discount + shipping + tax;
 
+  // Format angka dengan "Rp"
+  const formatCurrency = (value) => {
+    return `Rp ${value.toLocaleString()}`;
+  };
+
+  // Fungsi untuk menangani pembuatan transaksi
+  const handleCreateTransaction = () => {
+    const items = rows.map((row) => ({
+      produk_id: products.find((product) => product.name === row.item)?.id || null,
+      kuantitas: row.qty,
+    }));
+
+    const data = {
+      customer_id: selectedCustomer,
+      jatuh_tempo: dueDate,
+      status: paymentStatus,
+      items: items,
+      diskon: discount,
+      ongkir: shipping,
+      tax: tax,
+    };
+
+    // Kirim data ke backend menggunakan Inertia
+    router.post("/invoices", data, {
+      onSuccess: () => {
+        alert("Transaksi berhasil dibuat!");
+      },
+      onError: (errors) => {
+        alert("Terjadi kesalahan: " + JSON.stringify(errors));
+      },
+    });
+  };
+
   return (
     <DashboardLayout>
       <Head title="Tambah Invoices" />
@@ -49,10 +86,16 @@ export default function Invoice({ products = [], customers = [] }) {
 
       <div className="flex flex-col gap-2">
         <label className="font-semibold text-[#646262]">Nama Customer</label>
-        <select className="w-full p-2 border rounded cursor-pointer">
-          <option>Pilih Customer</option>
+        <select
+          className="w-full p-2 border rounded cursor-pointer"
+          value={selectedCustomer}
+          onChange={(e) => setSelectedCustomer(e.target.value)}
+        >
+          <option value="">Pilih Customer</option>
           {customers.map((customer) => (
-            <option key={customer.id} value={customer.id}>{customer.name}</option>
+            <option key={customer.id} value={customer.id}>
+              {customer.name}
+            </option>
           ))}
         </select>
       </div>
@@ -60,12 +103,23 @@ export default function Invoice({ products = [], customers = [] }) {
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px] flex flex-col gap-2">
           <label className="font-semibold text-[#646262]">Jatuh Tempo</label>
-          <input type="date" className="w-full p-2 border rounded cursor-pointer" />
+          <input
+            type="date"
+            className="w-full p-2 border rounded cursor-pointer"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
         </div>
         <div className="flex-1 min-w-[200px] flex flex-col gap-2">
           <label className="font-semibold text-[#646262]">Status Pembayaran</label>
-          <select className="w-full p-2 border rounded cursor-pointer">
-            <option>Pilih Status</option>
+          <select
+            className="w-full p-2 border rounded cursor-pointer"
+            value={paymentStatus}
+            onChange={(e) => setPaymentStatus(e.target.value)}
+          >
+            <option value="Belum dibayar">Belum dibayar</option>
+            <option value="Dibayar sebagian">Dibayar sebagian</option>
+            <option value="Lunas">Lunas</option>
           </select>
         </div>
       </div>
@@ -91,9 +145,11 @@ export default function Invoice({ products = [], customers = [] }) {
                   value={row.item}
                   onChange={(e) => updateRow(index, "item", e.target.value)}
                 >
-                  <option>Pilih Item</option>
+                  <option value="">Pilih Item</option>
                   {products.map((product) => (
-                    <option key={product.id} value={product.name}>{product.name}</option>
+                    <option key={product.id} value={product.name}>
+                      {product.name}
+                    </option>
                   ))}
                 </select>
               </td>
@@ -106,10 +162,16 @@ export default function Invoice({ products = [], customers = [] }) {
                   onChange={(e) => updateRow(index, "qty", e.target.value)}
                 />
               </td>
-              <td className="p-2 w-[110px] text-center">{productPrices[row.item]?.toLocaleString() || "-"}</td>
-              <td className="p-2 w-[110px] text-center">{row.total.toLocaleString()}</td>
+              <td className="p-2 w-[110px] text-center">
+                {productPrices[row.item] ? formatCurrency(productPrices[row.item]) : "-"}
+              </td>
+              <td className="p-2 w-[110px] text-center">
+                {formatCurrency(row.total)}
+              </td>
               <td className="p-2 text-center">
-                <button onClick={() => removeRow(index)} className="text-red-500 hover:underline"><MdOutlineCancel size={24}/></button>
+                <button onClick={() => removeRow(index)} className="text-red-500 hover:underline">
+                  <MdOutlineCancel size={24} />
+                </button>
               </td>
             </tr>
           ))}
@@ -122,20 +184,45 @@ export default function Invoice({ products = [], customers = [] }) {
       <div className="grid gap-4 md:grid-cols-3">
         <div>
           <label className="block font-semibold">Diskon</label>
-          <input type="number" value={discount} onChange={(e) => setDiscount(parseInt(e.target.value) || 0)} className="w-full p-2 border rounded mt-1" />
+          <input
+            type="number"
+            value={discount}
+            onChange={(e) => setDiscount(parseInt(e.target.value) || 0)}
+            className="w-full p-2 border rounded mt-1"
+          />
         </div>
         <div>
           <label className="block font-semibold">Ongkir</label>
-          <input type="number" value={shipping} onChange={(e) => setShipping(parseInt(e.target.value) || 0)} className="w-full p-2 border rounded mt-1" />
+          <input
+            type="number"
+            value={shipping}
+            onChange={(e) => setShipping(parseInt(e.target.value) || 0)}
+            className="w-full p-2 border rounded mt-1"
+          />
         </div>
         <div>
           <label className="block font-semibold">Pajak</label>
-          <input type="number" value={tax} onChange={(e) => setTax(parseInt(e.target.value) || 0)} className="w-full p-2 border rounded mt-1" />
+          <input
+            type="number"
+            value={tax}
+            onChange={(e) => setTax(parseInt(e.target.value) || 0)}
+            className="w-full p-2 border rounded mt-1"
+          />
         </div>
       </div>
 
       <div className="text-right font-bold text-lg">
-        Total Harga: IDR {total.toLocaleString()}
+        Total Harga: {formatCurrency(total)}
+      </div>
+
+      {/* Tombol Buat Transaksi */}
+      <div className="mt-6">
+        <button
+          onClick={handleCreateTransaction}
+          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Buat Transaksi
+        </button>
       </div>
     </DashboardLayout>
   );
