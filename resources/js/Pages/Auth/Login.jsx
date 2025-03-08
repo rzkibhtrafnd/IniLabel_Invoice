@@ -4,7 +4,7 @@ import Button from "../../Components/Buttons";
 import Input from "../../Components/Input";
 
 export default function Login() {
-  const { data, reset, setData, processing } = useForm({
+  const { data, setData, post, processing } = useForm({
     email: "",
     password: "",
   });
@@ -15,9 +15,7 @@ export default function Login() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    router.post('/login', data, {
-      onSuccess: () => reset()
-    });
+    post('/login', data);
   }
 
   return (
@@ -63,9 +61,10 @@ export default function Login() {
           <Button
             type="submit"
             disabled={processing}
-            className="w-full flex justify-center text-center bg-[#003465] rounded-lg transition duration-300"
+            className={`w-full flex justify-center text-center rounded-lg transition duration-300 
+            ${processing ? "bg-gray-400 cursor-not-allowed" : "bg-[#003465] hover:bg-[#00234a]"}`}
           >
-            {processing ? "Logging in..." : "Login"}
+            {processing ? "Memproses..." : "Masuk"}
           </Button>
         </form>
       </div>
