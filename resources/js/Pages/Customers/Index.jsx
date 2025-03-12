@@ -15,7 +15,7 @@ import { MdOutlineCancel } from "react-icons/md";
 export default function Index({ customers = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
 
-  const { data, setData, reset, processing } = useForm({
+  const { data, setData, reset, processing, delete: destroy } = useForm({
     id: "",
     name: "",
     email: "",
@@ -54,7 +54,7 @@ export default function Index({ customers = [] }) {
   }
 
   function onDeleteCustomer(id) {
-    router.delete(`/customers/${id}`);
+    destroy(`/customers/${id}`);
   }
 
   return (

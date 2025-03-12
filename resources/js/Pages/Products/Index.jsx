@@ -11,6 +11,7 @@ import Button from "../../Components/Buttons";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
+import formatToRupiah from "../../utils/formatToRupiah";
 
 export default function Index({ products = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
@@ -84,10 +85,7 @@ export default function Index({ products = [] }) {
                 </TableData>
                 <TableData className="text-nowrap">{product.name}</TableData>
                 <TableData>
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  }).format(product.price)}
+                  {formatToRupiah(product.price)}
                 </TableData>
                 <TableData>{product.stock}</TableData>
                 <TableData className="px-1 w-[111px]">

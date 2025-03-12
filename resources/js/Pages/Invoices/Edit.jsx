@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../../Layouts/DashboardLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { MdOutlineCancel } from "react-icons/md";
 import { CiSquarePlus } from "react-icons/ci";
 import { IoIosArrowBack } from "react-icons/io";
 import formatToRupiah from "../../utils/formatToRupiah";
 
-export default function Invoice({ products = [], customers = [] }) {
+export default function Invoice({ invoice = [], products = [], customers = [] }) {
   const containerRef = useRef(null);
   const [isMedium, setIsMedium] = useState(true);
-  const [rows, setRows] = useState([{ produk_id: "", kuantitas: 1, total: 0 }]);
-  const { data, setData, post, processing } = useForm({
-    customer_id: "",
-    jatuh_tempo: "",
-    status: "Belum dibayar",
-    items: [],
-    diskon: 0,
-    ongkir: 0,
+  const [rows, setRows] = useState(invoice.details);
+  const { data, setData, put, processing } = useForm({
+    customer_id: invoice.customer_id,
+    jatuh_tempo: invoice.jatuh_tempo,
+    status: invoice.status,
+    items: invoice.details,
+    diskon: Number(invoice.diskon),
+    ongkir: Number(invoice.ongkir),
     tax: 0,
   });
 
@@ -26,25 +26,25 @@ export default function Invoice({ products = [], customers = [] }) {
   }, {});
 
   const addItem = () => {
-    setRows([...rows, { produk_id: "", kuantitas: 1, total: 0 }]);
+    setRows([...rows, { produk_id: "", kuantitas: 1, total_harga: 0 }]);
   };
 
   const updateRow = (index, key, value) => {
     const newRows = [...rows];
     if (key === "id") {
       newRows[index].produk_id = value;
-      newRows[index].total = newRows[index].kuantitas * (productPrices[value] || 0);
+      newRows[index].total_harga = newRows[index].kuantitas * (productPrices[value] || 0);
     } else if (key === "kuantitas") {
       if (value === "") {
         newRows[index].kuantitas = "";
-        newRows[index].total = 0;
+        newRows[index].total_harga = 0;
       } else {
         newRows[index].kuantitas = parseInt(value) || 1;
-        newRows[index].total = newRows[index].kuantitas * (productPrices[newRows[index].produk_id] || 0);
+        newRows[index].total_harga = newRows[index].kuantitas * (productPrices[newRows[index].produk_id] || 0);
       }
     }
     setRows(newRows);
-    setData('items', rows);
+    setData('items', newRows);
   };
 
   const removeRow = (index) => {
@@ -53,13 +53,12 @@ export default function Invoice({ products = [], customers = [] }) {
     setData('items', newRows);
   };
   
-
-  const subtotal = rows.reduce((sum, row) => sum + row.total, 0);
+  const subtotal = rows.reduce((sum, row) => sum + Number(row.total_harga), 0);
   const total = subtotal - data.diskon + data.ongkir + data.tax;
 
   const handleCreateTransaction = (e) => {
     e.preventDefault();
-    post("/invoices", data);
+    put(`/invoices/${invoice.id}`, data);
   };
 
   useEffect(() => {
@@ -189,10 +188,10 @@ export default function Invoice({ products = [], customers = [] }) {
                     <td className="p-1 min-w-[150px]">
                       <select
                         className="w-full border bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-md p-2"
-                        value={row.name}
+                        value={row.id}
                         onChange={(e) => updateRow(index, "id", e.target.value)}
                       >
-                        <option value="">Pilih Item</option>
+                        <option value={row.product?.id || ''}>{row.product?.name || 'Pilih Item'}</option>
                         {products.map((product) => (
                           <option key={product.id} value={product.id}>{product.name}</option>
                         ))}
@@ -208,7 +207,7 @@ export default function Invoice({ products = [], customers = [] }) {
                       />
                     </td>
                     <td className="p-2 w-[110px] text-center">{productPrices[row.produk_id] ? formatToRupiah(productPrices[row.produk_id]) : "-"}</td>
-                    <td className="p-2 w-[110px] text-center">{formatToRupiah(row.total)}</td>
+                    <td className="p-2 w-[110px] text-center">{formatToRupiah(row.total_harga)}</td>
                     <td className="p-2 text-center">
                       <button onClick={() => removeRow(index)} className="text-red-500 cursor-pointer"><MdOutlineCancel size={24}/></button>
                     </td>

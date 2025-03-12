@@ -6,12 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('customer', function (Blueprint $table) {
+        Schema::create('customers', function (Blueprint $table) { // Ubah ke bentuk plural
+            $table->engine = 'InnoDB'; // Tambahkan ini
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -21,11 +19,8 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('customer');
+        Schema::dropIfExists('customers'); // Sesuaikan dengan nama tabel
     }
 };

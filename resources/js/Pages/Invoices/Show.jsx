@@ -1,65 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../../Layouts/DashboardLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
-import { MdOutlineCancel } from "react-icons/md";
-import { CiSquarePlus } from "react-icons/ci";
+import { Head, Link, } from "@inertiajs/react";
 import { IoIosArrowBack } from "react-icons/io";
 import formatToRupiah from "../../utils/formatToRupiah";
 
-export default function Invoice({ products = [], customers = [] }) {
+export default function Invoice({ invoice = [] }) {
   const containerRef = useRef(null);
   const [isMedium, setIsMedium] = useState(true);
-  const [rows, setRows] = useState([{ produk_id: "", kuantitas: 1, total: 0 }]);
-  const { data, setData, post, processing } = useForm({
-    customer_id: "",
-    jatuh_tempo: "",
-    status: "Belum dibayar",
-    items: [],
-    diskon: 0,
-    ongkir: 0,
-    tax: 0,
-  });
+  const rows = invoice.details;
 
-  const productPrices = products.reduce((acc, product) => {
-    acc[product.id] = product.price;
-    return acc;
-  }, {});
+  const handleShare = async () => {
+    const shareData = {
+      title: "Judul Konten",
+      text: "Deskripsi singkat konten.",
+      url: window.location.href,
+    };
 
-  const addItem = () => {
-    setRows([...rows, { produk_id: "", kuantitas: 1, total: 0 }]);
-  };
-
-  const updateRow = (index, key, value) => {
-    const newRows = [...rows];
-    if (key === "id") {
-      newRows[index].produk_id = value;
-      newRows[index].total = newRows[index].kuantitas * (productPrices[value] || 0);
-    } else if (key === "kuantitas") {
-      if (value === "") {
-        newRows[index].kuantitas = "";
-        newRows[index].total = 0;
-      } else {
-        newRows[index].kuantitas = parseInt(value) || 1;
-        newRows[index].total = newRows[index].kuantitas * (productPrices[newRows[index].produk_id] || 0);
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        console.log("Berhasil dibagikan");
+      } catch (error) {
+        console.error("Gagal membagikan", error);
       }
+    } else {
+      window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        shareData.text + " " + shareData.url
+      )}`;
     }
-    setRows(newRows);
-    setData('items', rows);
-  };
-
-  const removeRow = (index) => {
-    const newRows = [...rows.slice(0, index), ...rows.slice(index + 1)];
-    setRows(newRows);
-    setData('items', newRows);
-  };
-  
-
-  const subtotal = rows.reduce((sum, row) => sum + row.total, 0);
-  const total = subtotal - data.diskon + data.ongkir + data.tax;
-
-  const handleCreateTransaction = (e) => {
-    e.preventDefault();
-    post("/invoices", data);
   };
 
   useEffect(() => {
@@ -91,14 +59,10 @@ export default function Invoice({ products = [], customers = [] }) {
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-[#646262]">Nama Customer</label>
             <select
-              value={data.customer_id}
-              onChange={(e) => setData('customer_id', e.target.value)}
+              value={invoice.customer.id}
               className="w-full p-2 border rounded cursor-pointer"
             >
-              <option value="">Pilih Customer</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>{customer.name}</option>
-              ))}
+              <option value={invoice.customer.id}>{invoice.customer.name}</option>
             </select>
           </div>
 
@@ -108,20 +72,16 @@ export default function Invoice({ products = [], customers = [] }) {
               <input
                 type="date"
                 className="w-full p-2 border rounded cursor-pointer"
-                value={data.jatuh_tempo}
-                onChange={(e) => setData('jatuh_tempo', e.target.value)}
+                value={invoice.jatuh_tempo}
               />
             </div>
             <div className="flex-1 min-w-[200px] flex flex-col gap-2">
               <label className="font-semibold text-[#646262]">Status Pembayaran</label>
               <select
                 className="w-full p-2 border rounded cursor-pointer"
-                value={data.status}
-                onChange={(e) => setData('status', e.target.value)}
+                value={invoice.status}
               >
-                <option value="Belum dibayar">Belum dibayar</option>
-                <option value="Dibayar sebagian">Dibayar sebagian</option>
-                <option value="Lunas">Lunas</option>
+                <option value={invoice.status}>{invoice.status}</option>
               </select>
             </div>
           </div>
@@ -132,8 +92,7 @@ export default function Invoice({ products = [], customers = [] }) {
             <input
               type="text"
               inputMode="numeric"
-              value={data.diskon === 0 ? "" : data.diskon} 
-              onChange={(e) => setData('diskon', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              value={invoice.diskon} 
               className="w-full p-2 border rounded mt-1"
             />
           </div>
@@ -142,8 +101,7 @@ export default function Invoice({ products = [], customers = [] }) {
             <input
               type="text"
               inputMode="numeric"
-              value={data.ongkir === 0 ? "" : data.ongkir}
-              onChange={(e) => setData('ongkir', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              value={invoice.ongkir}
               className="w-full p-2 border rounded mt-1"
             />
           </div>
@@ -152,21 +110,17 @@ export default function Invoice({ products = [], customers = [] }) {
             <input
               type="text"
               inputMode="numeric"
-              value={data.tax === 0 ? "" : data.tax}
-              onChange={(e) => setData('tax', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              value={0}
               className="w-full p-2 border rounded mt-1"
             />
           </div>
           <div className="mt-10 flex flex-col gap-4">
             <p className="font-bold text-[#111] flex text-xl justify-between">
               <span>Total: </span>
-              <span>{formatToRupiah(total)}</span>
+              <span>{formatToRupiah(invoice.total_bayar)}</span>
             </p>
-            <button
-              onClick={handleCreateTransaction}
-              className="bg-[#01669E] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center"
-            >
-              Buat Transaksi
+            <button onClick={handleShare} className="p-2 bg-green-500 text-white rounded-lg">
+                Bagikan ke WhatsApp
             </button>
           </div>
         </div>
@@ -184,42 +138,31 @@ export default function Invoice({ products = [], customers = [] }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, index) => (
+                {rows.map((invoice, index) => (
                   <tr key={index}>
                     <td className="p-1 min-w-[150px]">
                       <select
                         className="w-full border bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-md p-2"
-                        value={row.name}
                         onChange={(e) => updateRow(index, "id", e.target.value)}
                       >
-                        <option value="">Pilih Item</option>
-                        {products.map((product) => (
-                          <option key={product.id} value={product.id}>{product.name}</option>
-                        ))}
+                        <option value={invoice.id}>{invoice.product.name}</option>
                       </select>
                     </td>
                     <td className="p-2 w-[60px]">
                       <input
                         type="text"
                         inputMode="number"
-                        value={row.kuantitas}
+                        value={invoice.kuantitas}
                         className="w-full p-2 border bg-[#FCFDFD] border-[#D5D5D5] rounded-md"
-                        onChange={(e) => updateRow(index, "kuantitas", e.target.value)}
                       />
                     </td>
-                    <td className="p-2 w-[110px] text-center">{productPrices[row.produk_id] ? formatToRupiah(productPrices[row.produk_id]) : "-"}</td>
-                    <td className="p-2 w-[110px] text-center">{formatToRupiah(row.total)}</td>
-                    <td className="p-2 text-center">
-                      <button onClick={() => removeRow(index)} className="text-red-500 cursor-pointer"><MdOutlineCancel size={24}/></button>
-                    </td>
+                    <td className="p-2 w-[110px] text-center">{formatToRupiah(invoice.product.price)}</td>
+                    <td className="p-2 w-[110px] text-center">{formatToRupiah(invoice.total_harga)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <button onClick={addItem} className="p-1 items-center gap-2 flex w-fit text-[#4D4FED] font-bold underline cursor-pointer">
-            <CiSquarePlus size={24} /> Tambah Item
-          </button>
         </div>
       </div>
     </DashboardLayout>
