@@ -92,7 +92,7 @@ export default function Invoice({ invoice = [] }) {
             <input
               type="text"
               inputMode="numeric"
-              value={invoice.diskon} 
+              value={invoice.diskon}
               className="w-full p-2 border rounded mt-1"
             />
           </div>

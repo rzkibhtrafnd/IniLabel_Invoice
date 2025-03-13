@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -29,7 +30,7 @@ class InvoiceController extends Controller
             'invoice' => $invoice->load(['customer', 'details.product']),
         ]);
     }
-    
+
 
     public function create()
     {
@@ -146,8 +147,9 @@ class InvoiceController extends Controller
 
     public function downloadInvoice(Invoice $invoice)
     {
-        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
-
+        $invoice->load(['customer', 'details.product']);
+        $pdf = PDF::loadView('invoices.pdf', compact('invoice'));
         return $pdf->download("Invoice_{$invoice->id}.pdf");
     }
+
 }
