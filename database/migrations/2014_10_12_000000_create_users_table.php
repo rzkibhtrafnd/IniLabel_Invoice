@@ -9,10 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->engine = 'InnoDB'; // Tambahkan ini
+            $table->engine = 'InnoDB';
             $table->uuid('id')->primary();
-            $table->string('username'); // Perbaiki titik koma ganda
+            $table->string('username');
             $table->string('email')->unique();
+            $table->string('notelepon')->nullable();
+            $table->text('alamat')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

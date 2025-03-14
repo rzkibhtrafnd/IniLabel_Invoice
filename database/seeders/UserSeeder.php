@@ -21,6 +21,8 @@ class UserSeeder extends Seeder
                 'email' => 'ryan@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'notelepon' => '081234567890',
+                'alamat' => 'Jl. Merdeka No. 1, Jakarta',
             ],
             [
                 'id' => Str::uuid(),
@@ -28,6 +30,8 @@ class UserSeeder extends Seeder
                 'email' => 'fajar@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'notelepon' => '081298765432',
+                'alamat' => 'Jl. Sudirman No. 5, Bandung',
             ],
             [
                 'id' => Str::uuid(),
@@ -35,6 +39,8 @@ class UserSeeder extends Seeder
                 'email' => 'rizki@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'notelepon' => '081356789012',
+                'alamat' => 'Jl. Diponegoro No. 7, Surabaya',
             ],
             [
                 'id' => Str::uuid(),
@@ -42,6 +48,8 @@ class UserSeeder extends Seeder
                 'email' => 'imersa@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'superadmin',
+                'notelepon' => '081678901234',
+                'alamat' => 'Jl. Gatot Subroto No. 3, Yogyakarta',
             ],
         ];
 
@@ -52,9 +60,12 @@ class UserSeeder extends Seeder
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('password'),
                 'role' => 'user',
+                'notelepon' => $faker->phoneNumber,
+                'alamat' => $faker->address,
             ];
         }
 
         User::insert($users);
     }
+
 }

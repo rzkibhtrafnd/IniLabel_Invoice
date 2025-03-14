@@ -16,48 +16,56 @@ class AdminController extends Controller
     public function index()
     {
         return Inertia::render('Users/Index', [
-            'users' => User::all(['id', 'username', 'email'])->toArray()
+            'users' => User::all(['id', 'username', 'email', 'notelepon', 'alamat'])->toArray()
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'username'  => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required|min:6',
+            'notelepon' => 'nullable|string|max:255',
+            'alamat'    => 'nullable|string',
         ]);
-    
+
         User::create([
-            'id' => Str::uuid(),
-            'username' => $validated['username'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'id'        => Str::uuid(),
+            'username'  => $validated['username'],
+            'email'     => $validated['email'],
+            'password'  => Hash::make($validated['password']),
+            'notelepon' => $validated['notelepon'] ?? null,
+            'alamat'    => $validated['alamat'] ?? null,
         ]);
-    
+
         return Redirect::route('users.index')->with('message', 'Data Berhasil Disimpan!');
-    }    
+    }
 
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|min:6',
+            'username'  => 'required|string|max:255',
+            'email'     => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password'  => 'nullable|min:6',
+            'notelepon' => 'nullable|string|max:255',
+            'alamat'    => 'nullable|string',
         ]);
-    
+
         $user->update([
-            'username' => $validated['username'],
-            'email' => $validated['email'],
-            'password' => $validated['password'] ? Hash::make($validated['password']) : $user->password,
+            'username'  => $validated['username'],
+            'email'     => $validated['email'],
+            'password'  => $validated['password'] ? Hash::make($validated['password']) : $user->password,
+            'notelepon' => $validated['notelepon'] ?? $user->notelepon,
+            'alamat'    => $validated['alamat'] ?? $user->alamat,
         ]);
-    
+
         return Redirect::route('users.index')->with('message', 'Data Berhasil Disimpan!');
-    }    
+    }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return Redirect::route('users.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('users.index')->with('message', 'Data Berhasil Dihapus!');
     }
 }
