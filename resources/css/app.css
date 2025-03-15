@@ -7,3 +7,7 @@
   --color-slate: #4a4a68;
   --color-light-slate: #8c8ca1;
 }
+
+* {
+  font-family: 'Work Sans', sans-serif;
+}

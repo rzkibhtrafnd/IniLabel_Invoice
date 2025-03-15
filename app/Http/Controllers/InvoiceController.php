@@ -148,8 +148,15 @@ class InvoiceController extends Controller
     public function downloadInvoice(Invoice $invoice)
     {
         $invoice->load(['customer', 'details.product']);
-        $pdf = PDF::loadView('invoices.pdf', compact('invoice'));
+        $imagePath = public_path('assets/logo.png');
+        $imageData = base64_encode(file_get_contents($imagePath));
+        $imageSrc = 'data:image/png;base64,' . $imageData;
+        
+        $pdf = PDF::loadView('invoices.pdf', compact('invoice', 'imageSrc'))
+            ->setPaper('A4', 'portrait')
+            ->setOptions(['margin-left' => 0, 'margin-right' => 0, 'margin-top' => 0, 'margin-bottom' => 0]);
+    
+        // return view('invoices.pdf', compact('invoice', 'imageSrc'));
         return $pdf->download("Invoice_{$invoice->id}.pdf");
     }
-
 }

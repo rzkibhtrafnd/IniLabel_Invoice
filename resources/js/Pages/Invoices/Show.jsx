@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../../Layouts/DashboardLayout";
-import { Head, Link, } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { IoIosArrowBack } from "react-icons/io";
 import formatToRupiah from "../../utils/formatToRupiah";
 
@@ -44,26 +44,24 @@ export default function Invoice({ invoice = [] }) {
 
   return (
     <DashboardLayout>
-      <Head title="Tambah Invoice" />
+      <Head title="Detail Invoice" />
       <Link href="/invoices" className="inline-flex items-center text-blue-500 hover:underline">
         <IoIosArrowBack size={24} className="mr-2" /> Kembali
       </Link>
       <div
         ref={containerRef}
-        className={`grid gap-6 ${
-          isMedium ? "grid-cols-1" : "grid-cols-[6fr_4fr] auto-rows-auto"
-        }`}
+        className={`grid gap-6 ${isMedium ? "grid-cols-1" : "grid-cols-[6fr_4fr] auto-rows-auto"}`}
       >
         <div className={`flex flex-col gap-4 ${isMedium ? "order-1" : ""}`}>
-          <h2 className="text-2xl font-bold">Tambah Invoice</h2>
+          <h2 className="text-2xl font-bold">Detail Invoice</h2>
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-[#646262]">Nama Customer</label>
-            <select
-              value={invoice.customer.id}
-              className="w-full p-2 border rounded cursor-pointer"
-            >
-              <option value={invoice.customer.id}>{invoice.customer.name}</option>
-            </select>
+            <input
+              type="text"
+              value={invoice.customer.name}
+              className="w-full p-2 border rounded bg-gray-100"
+              disabled
+            />
           </div>
 
           <div className="flex flex-wrap gap-4">
@@ -71,18 +69,19 @@ export default function Invoice({ invoice = [] }) {
               <label className="font-semibold text-[#646262]">Jatuh Tempo</label>
               <input
                 type="date"
-                className="w-full p-2 border rounded cursor-pointer"
+                className="w-full p-2 border rounded bg-gray-100"
                 value={invoice.jatuh_tempo}
+                disabled
               />
             </div>
             <div className="flex-1 min-w-[200px] flex flex-col gap-2">
               <label className="font-semibold text-[#646262]">Status Pembayaran</label>
-              <select
-                className="w-full p-2 border rounded cursor-pointer"
+              <input
+                type="text"
+                className="w-full p-2 border rounded bg-gray-100"
                 value={invoice.status}
-              >
-                <option value={invoice.status}>{invoice.status}</option>
-              </select>
+                disabled
+              />
             </div>
           </div>
         </div>
@@ -93,7 +92,8 @@ export default function Invoice({ invoice = [] }) {
               type="text"
               inputMode="numeric"
               value={invoice.diskon}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded bg-gray-100"
+              disabled
             />
           </div>
           <div>
@@ -102,7 +102,8 @@ export default function Invoice({ invoice = [] }) {
               type="text"
               inputMode="numeric"
               value={invoice.ongkir}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded bg-gray-100"
+              disabled
             />
           </div>
           <div>
@@ -111,7 +112,8 @@ export default function Invoice({ invoice = [] }) {
               type="text"
               inputMode="numeric"
               value={0}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded bg-gray-100"
+              disabled
             />
           </div>
           <div className="mt-10 flex flex-col gap-4">
@@ -120,8 +122,14 @@ export default function Invoice({ invoice = [] }) {
               <span>{formatToRupiah(invoice.total_bayar)}</span>
             </p>
             <button onClick={handleShare} className="p-2 bg-green-500 text-white rounded-lg">
-                Bagikan ke WhatsApp
+              Bagikan ke WhatsApp
             </button>
+            <a
+              href={`/invoices/${invoice.id}/download`}
+              className="p-2 bg-blue-500 text-white text-center rounded-lg"
+            >
+              Download PDF
+            </a>
           </div>
         </div>
         <div className={`flex flex-col gap-2 ${isMedium ? "order-2" : "col-span-2"}`}>
@@ -134,26 +142,26 @@ export default function Invoice({ invoice = [] }) {
                   <th className="p-1 text-sm text-[#646262] w-[60px]">Qty</th>
                   <th className="p-1 text-sm text-[#646262] w-[110px]">Satuan</th>
                   <th className="p-1 text-sm text-[#646262] w-[110px]">Total</th>
-                  <th className="p-1 text-sm text-[#646262] w-[40px]"></th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((invoice, index) => (
                   <tr key={index}>
                     <td className="p-1 min-w-[150px]">
-                      <select
-                        className="w-full border bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-md p-2"
-                        onChange={(e) => updateRow(index, "id", e.target.value)}
-                      >
-                        <option value={invoice.id}>{invoice.product.name}</option>
-                      </select>
+                      <input
+                        type="text"
+                        className="w-full border bg-gray-100 border-[#D5D5D5] rounded-md p-2"
+                        value={invoice.product.name}
+                        disabled
+                      />
                     </td>
                     <td className="p-2 w-[60px]">
                       <input
                         type="text"
                         inputMode="number"
                         value={invoice.kuantitas}
-                        className="w-full p-2 border bg-[#FCFDFD] border-[#D5D5D5] rounded-md"
+                        className="w-full p-2 border bg-gray-100 border-[#D5D5D5] rounded-md"
+                        disabled
                       />
                     </td>
                     <td className="p-2 w-[110px] text-center">{formatToRupiah(invoice.product.price)}</td>
