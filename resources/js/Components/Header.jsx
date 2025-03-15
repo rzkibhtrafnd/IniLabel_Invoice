@@ -78,7 +78,7 @@ export default function Header() {
           <img src={logo} alt="Logo" className="px-4" width={180} height={180} />
           <ul className="flex flex-col gap-2">
             {menuItems.map(({ href, icon, label, isShow, componentName }) =>
-              isShow !== false ? (
+              isShow ? (
                 <MenuItem key={href} href={href} icon={icon} label={label} isActive={component.includes(componentName)} />
               ) : null
             )}
