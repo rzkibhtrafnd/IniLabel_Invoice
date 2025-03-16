@@ -12,7 +12,9 @@ class ProductController extends Controller
     public function index()
     {
         return Inertia::render('Products/Index', [
-            'products' => Product::all(['id', 'name', 'description', 'price', 'stock'])->toArray()
+            'products' => Product::select(['id', 'name', 'description', 'price', 'stock'])
+                ->latest()
+                ->paginate(15)
         ]);
     }
 

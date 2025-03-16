@@ -85,8 +85,8 @@ export default function Index({ users = [] }) {
         </Button>
       </Heading>
 
-      {users.length > 0 ? (
-        <Table>
+      {users.data.length > 0 ? (
+        <Table data={users}>
           <TableHead>
             <TableHeader>No</TableHeader>
             <TableHeader>Username</TableHeader>
@@ -94,7 +94,7 @@ export default function Index({ users = [] }) {
             <TableHeader colSpan={3}>Aksi</TableHeader>
           </TableHead>
           <tbody>
-            {users.map((user, index) => (
+            {users.data.map((user, index) => (
               <tr key={user.id}>
                 <TableData className="font-bold text-light-slate">
                   {index + 1}

@@ -12,7 +12,9 @@ class CustomerController extends Controller
     public function index()
     {
         return Inertia::render('Customers/Index', [
-            'customers' => Customer::all(['id', 'name', 'email', 'phone', 'address'])->toArray()
+            'customers' => Customer::select(['id', 'name', 'email', 'phone', 'address'])
+                ->latest()
+                ->paginate(15)
         ]);
     }
 

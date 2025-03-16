@@ -83,8 +83,8 @@ export default function Index({ products = [] }) {
         </Button>
       </Heading>
 
-      {products.length > 0 ? (
-        <Table>
+      {products.data.length > 0 ? (
+        <Table data={products}>
           <TableHead>
             <TableHeader>No</TableHeader>
             <TableHeader>Nama</TableHeader>
@@ -93,7 +93,7 @@ export default function Index({ products = [] }) {
             <TableHeader colSpan={3}>Aksi</TableHeader>
           </TableHead>
           <tbody>
-            {products.map((product, index) => (
+            {products.data.map((product, index) => (
               <tr key={product.id}>
                 <TableData className="font-bold text-light-slate">
                   {index + 1}

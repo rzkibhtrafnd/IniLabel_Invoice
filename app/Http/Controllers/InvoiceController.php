@@ -17,7 +17,7 @@ class InvoiceController extends Controller
     {
         $invoices = Invoice::with(['customer', 'user'])
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
         return Inertia::render('Invoices/Index', [
             'invoices' => $invoices,

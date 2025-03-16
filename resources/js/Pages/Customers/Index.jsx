@@ -82,8 +82,8 @@ export default function Index({ customers = [] }) {
         </Button>
       </Heading>
 
-      {customers.length > 0 ? (
-        <Table>
+      {customers.data.length > 0 ? (
+        <Table data={customers}>
           <TableHead>
             <TableHeader>No</TableHeader>
             <TableHeader>Nama</TableHeader>
@@ -92,7 +92,7 @@ export default function Index({ customers = [] }) {
             <TableHeader colSpan={3}>Aksi</TableHeader>
           </TableHead>
           <tbody>
-            {customers.map((customer, index) => (
+            {customers.data.map((customer, index) => (
               <tr key={customer.id}>
                 <TableData className="font-bold text-light-slate">
                   {index + 1}

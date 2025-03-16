@@ -16,7 +16,9 @@ class AdminController extends Controller
     public function index()
     {
         return Inertia::render('Users/Index', [
-            'users' => User::all(['id', 'username', 'email', 'notelepon', 'alamat'])->toArray()
+            'users' => User::select(['id', 'username', 'email', 'notelepon', 'alamat'])
+                ->latest()
+                ->paginate(15)
         ]);
     }
 

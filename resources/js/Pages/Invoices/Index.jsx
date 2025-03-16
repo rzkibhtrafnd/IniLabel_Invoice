@@ -39,7 +39,7 @@ export default function Invoice({ invoices }) {
       </Heading>
 
       {invoices.data.length > 0 ? (
-        <Table>
+        <Table data={invoices}>
           <TableHead>
             <TableHeader>Id</TableHeader>
             <TableHeader>Customer</TableHeader>
