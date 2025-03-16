@@ -28,7 +28,7 @@ export default function Invoice({ invoices }) {
 
   return (
     <DashboardLayout>
-      <Head title="Invoices" />
+      <Head title="Invoice" />
       <Heading title="Data Invoice" subTitle="Invoice">
         <Link href="/invoices/create">
           <Button className="bg-[#01669E]">

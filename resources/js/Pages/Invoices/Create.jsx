@@ -75,7 +75,7 @@ export default function Invoice({ products = [], customers = [] }) {
   }, []);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout className="bg-white">
       <Head title="Tambah Invoice" />
       <Link href="/invoices" className="inline-flex items-center text-blue-500 hover:underline">
         <IoIosArrowBack size={24} className="mr-2" /> Kembali

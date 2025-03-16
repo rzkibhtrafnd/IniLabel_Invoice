@@ -22,7 +22,7 @@ export default function Index({ customers = [] }) {
     phone: "",
     address: "",
   });
-  const [mode, setMode] = useState("create"); // mode: "create", "edit", "detail"
+  const [mode, setMode] = useState("create");
 
   function handleChange(e) {
     setData(e.target.id, e.target.value);
@@ -74,7 +74,7 @@ export default function Index({ customers = [] }) {
 
   return (
     <DashboardLayout>
-      <Head title="Customers" />
+      <Head title="Customer" />
       <Heading title="Data Customer" subTitle="customer">
         <Button onClick={handleAddCustomer} className="bg-[#01669E]">
           Tambah

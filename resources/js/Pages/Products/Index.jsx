@@ -75,7 +75,7 @@ export default function Index({ products = [] }) {
 
   return (
     <DashboardLayout>
-      <Head title="Products" />
+      <Head title="Produk" />
       <Heading title="Data Produk" subTitle="produk">
         <Button onClick={handleAddProduct} className="bg-[#01669E]">
           Tambah
