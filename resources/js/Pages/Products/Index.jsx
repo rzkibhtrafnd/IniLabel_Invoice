@@ -11,13 +11,13 @@ import usePopup from "../../hooks/usePopup";
 import Button from "../../Components/Buttons";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
-import { MdOutlineCancel } from "react-icons/md";
 import formatToRupiah from "../../utils/formatToRupiah";
 import Pagination from "../../Components/Tables/Pagination";
+import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 
 export default function Index({ products = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
-  const { data, setData, reset, processing } = useForm({
+  const { data, setData, reset, processing, delete: destroy } = useForm({
     id: "",
     name: "",
     description: "",
@@ -70,10 +70,6 @@ export default function Index({ products = [] }) {
     openPopup();
   }
 
-  function onDeleteProduct(id) {
-    router.delete(`/products/${id}`);
-  }
-
   return (
     <DashboardLayout>
       <Head title="Produk" />
@@ -124,13 +120,11 @@ export default function Index({ products = [] }) {
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <Button
-                      onClick={() => onDeleteProduct(product.id)}
-                      className="bg-[#D30368] text-[1rem]"
-                    >
-                      Hapus
-                      <MdOutlineCancel size={24} />
-                    </Button>
+                    <ConfirmPopup
+                      title="Hapus Produk?" 
+                      text="Apakah Anda yakin ingin menghapus Produk ini?" 
+                      onConfirm={() => destroy(`/products/${product.id}`)}
+                    />
                   </TableData>
                 </tr>
               ))}

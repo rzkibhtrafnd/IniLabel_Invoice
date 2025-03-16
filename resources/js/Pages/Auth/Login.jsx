@@ -1,9 +1,11 @@
-import { Head, router, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import logo from "../../../assets/logo.png";
+import Swal from "sweetalert2";
 import Button from "../../Components/Buttons";
 import Input from "../../Components/Input";
+import { useEffect } from "react";
 
-export default function Login() {
+export default function Login({ flash }) {
   const { data, setData, post, processing } = useForm({
     email: "",
     password: "",
@@ -17,6 +19,30 @@ export default function Login() {
     e.preventDefault();
     post('/login', data);
   }
+
+  useEffect(() => {
+    if (flash?.message) {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: flash.message.includes("berhasil") ? "success" : "error",
+        title: flash.message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        showClass: {
+          popup: "swal2-noanimation swal2-slide-in-right",
+        },
+        hideClass: {
+          popup: "swal2-noanimation swal2-slide-out-right",
+        },
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+    }
+  }, [flash]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

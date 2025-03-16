@@ -8,10 +8,10 @@ import TableHeader from "../../Components/Tables/TableHeader";
 import TableData from "../../Components/Tables/TableData";
 import { BsPlusCircle } from "react-icons/bs";
 import { TbEdit, TbSearch } from "react-icons/tb";
-import { MdOutlineCancel } from "react-icons/md";
 import formatToRupiah from "../../utils/formatToRupiah";
 import Status from "../../Components/Status";
 import Pagination from "../../Components/Tables/Pagination";
+import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 
 export default function Invoice({ invoices }) {
   const { get, delete: destroy } = useForm();
@@ -23,11 +23,7 @@ export default function Invoice({ invoices }) {
   function onUpdateInvoice(id) {
     get(`/invoices/${id}/edit`);
   }
-
-  function onDeleteInvoice(id) {
-    destroy(`/invoices/${id}`);
-  }
-
+  
   return (
     <DashboardLayout>
       <Head title="Invoice" />
@@ -80,10 +76,11 @@ export default function Invoice({ invoices }) {
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <Button onClick={() => onDeleteInvoice(invoice.id)} className="bg-[#D30368] text-[1rem]">
-                      Hapus
-                      <MdOutlineCancel size={24} />
-                    </Button>
+                    <ConfirmPopup
+                      title="Hapus Invoice?" 
+                      text="Apakah Anda yakin ingin menghapus invoice ini?" 
+                      onConfirm={() => destroy(`/invoices/${invoice.id}`)}
+                    />
                   </TableData>
                 </tr>
               ))}
@@ -94,7 +91,6 @@ export default function Invoice({ invoices }) {
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data invoice.</p>
       )}
-
     </DashboardLayout>
   );
 }

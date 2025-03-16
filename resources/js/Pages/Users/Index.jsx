@@ -13,10 +13,11 @@ import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
 import Pagination from "../../Components/Tables/Pagination";
+import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 
 export default function Index({ users = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
-  const { data, setData, reset, processing } = useForm({
+  const { data, setData, reset, processing, delete: destroy } = useForm({
     id: "",
     username: "",
     email: "",
@@ -122,13 +123,11 @@ export default function Index({ users = [] }) {
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <Button
-                      onClick={() => onDeleteUser(user.id)}
-                      className="bg-[#D30368] text-[1rem]"
-                    >
-                      Hapus
-                      <MdOutlineCancel size={24} />
-                    </Button>
+                    <ConfirmPopup
+                      title="Hapus Admin?" 
+                      text="Apakah Anda yakin ingin menghapus Admin ini?" 
+                      onConfirm={() => destroy(`/users/${user.id}`)}
+                    />
                   </TableData>
                 </tr>
               ))}

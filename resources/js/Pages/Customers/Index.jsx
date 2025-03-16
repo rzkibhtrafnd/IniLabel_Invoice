@@ -13,6 +13,7 @@ import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
 import Pagination from "../../Components/Tables/Pagination";
+import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 
 export default function Index({ customers = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
@@ -69,10 +70,6 @@ export default function Index({ customers = [] }) {
     openPopup();
   }
 
-  function onDeleteCustomer(id) {
-    destroy(`/customers/${id}`);
-  }
-
   return (
     <DashboardLayout>
       <Head title="Customer" />
@@ -121,13 +118,11 @@ export default function Index({ customers = [] }) {
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <Button
-                      onClick={() => onDeleteCustomer(customer.id)}
-                      className="bg-[#D30368] text-[1rem]"
-                    >
-                      Hapus
-                      <MdOutlineCancel size={24} />
-                    </Button>
+                    <ConfirmPopup
+                      title="Hapus Customer?" 
+                      text="Apakah Anda yakin ingin menghapus Customer ini?" 
+                      onConfirm={() => destroy(`/customers/${customer.id}`)}
+                    />
                   </TableData>
                 </tr>
               ))}
