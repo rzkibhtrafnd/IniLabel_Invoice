@@ -35,40 +35,39 @@ export default function Invoice({ invoice = [] }) {
           <h2 className="text-2xl font-bold">Detail Invoice</h2>
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-600">Nama Customer</label>
-            <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">{invoice.customer.name}</div>
+            <div className="border border-gray-300 px-3 py-2 rounded-[10px]">{invoice.customer.name}</div>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px] flex flex-col gap-2">
               <label className="font-semibold text-gray-600">Jatuh Tempo</label>
-              <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">{invoice.jatuh_tempo}</div>
+              <div className="border border-gray-300 px-3 py-2 rounded-[10px]">{invoice.jatuh_tempo}</div>
             </div>
             <div className="flex-1 min-w-[200px] flex flex-col gap-2">
               <label className="font-semibold text-gray-600">Status Pembayaran</label>
-              <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">{invoice.status}</div>
+              <div className="border border-gray-300 px-3 py-2 rounded-[10px]">{invoice.status}</div>
             </div>
           </div>
         </div>
-        <div className={`bg-white flex flex-col gap-4 p-4 rounded-xl shadow-md ${isMedium ? "order-3" : ""}`}>
+        <div className={`bg-[#F6F6F6] flex flex-col gap-4 p-6 rounded-xl ${isMedium ? "order-3" : ""}`}>
           <div>
             <label className="block text-sm text-gray-600 font-semibold">Diskon</label>
-            <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">{invoice.diskon}</div>
+            <div className="border border-gray-300 px-3 py-2 rounded-[10px]">{invoice.diskon}</div>
           </div>
           <div>
             <label className="block text-sm text-gray-600 font-semibold">Ongkir</label>
-            <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">{invoice.ongkir}</div>
+            <div className="border border-gray-300 px-3 py-2 rounded-[10px]">{invoice.ongkir}</div>
           </div>
           <div>
             <label className="block text-sm text-gray-600 font-semibold">Pajak</label>
-            <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">0</div>
+            <div className="border border-gray-300 px-3 py-2 rounded-[10px]">0</div>
           </div>
           <div className="mt-10 flex flex-col gap-4">
             <p className="font-bold text-gray-900 flex text-xl justify-between">
               <span>Total: </span>
               <span>{formatToRupiah(invoice.total_bayar)}</span>
             </p>
-            <button className="p-2 bg-green-500 text-white rounded-lg">Bagikan ke WhatsApp</button>
-            <a href={`/invoices/${invoice.id}/download`} className="p-2 bg-blue-500 text-white text-center rounded-lg">
+            <a href={`/invoices/${invoice.id}/download`} className="bg-[#01669E] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center">
               Download PDF
             </a>
           </div>
@@ -89,22 +88,22 @@ export default function Invoice({ invoice = [] }) {
                 {rows.map((invoice, index) => (
                   <tr key={index}>
                     <td className="p-1 min-w-[150px] text-nowrap">
-                      <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">
+                      <div className="border-2 border-gray-300 px-3 py-2 rounded-[7px]">
                         {invoice.product.name}
                       </div>
                     </td>
                     <td className="p-2 w-[60px]">
-                      <div className="border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">
+                      <div className="border-2 border-gray-300 px-3 py-2 rounded-[7px]">
                         {invoice.kuantitas}
                       </div>
                     </td>
                     <td className="p-2 w-[110px]">
-                      <div className="text-center border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">
+                      <div className="text-center border-2 border-gray-300 px-3 py-2 rounded-[7px]">
                         {formatToRupiah(invoice.product.price)}
                       </div>
                     </td>
                     <td className="p-2 w-[160px]">
-                      <div className="text-center border border-gray-300 bg-gray-100 px-3 py-2 rounded-md">
+                      <div className="text-center border-2 border-gray-300 px-3 py-2 rounded-[7px]">
                         {formatToRupiah(invoice.total_harga)}
                       </div>
                     </td>

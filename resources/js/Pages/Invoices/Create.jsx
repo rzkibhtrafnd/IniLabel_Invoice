@@ -13,7 +13,7 @@ export default function Invoice({ products = [], customers = [] }) {
   const { data, setData, post, processing } = useForm({
     customer_id: "",
     jatuh_tempo: "",
-    status: "Belum dibayar",
+    status: "Draft",
     items: [],
     diskon: 0,
     ongkir: 0,
@@ -93,7 +93,7 @@ export default function Invoice({ products = [], customers = [] }) {
             <select
               value={data.customer_id}
               onChange={(e) => setData('customer_id', e.target.value)}
-              className="w-full p-2 border rounded cursor-pointer"
+              className="w-full p-2 border rounded-[10px] cursor-pointer"
             >
               <option value="">Pilih Customer</option>
               {customers.map((customer) => (
@@ -107,7 +107,7 @@ export default function Invoice({ products = [], customers = [] }) {
               <label className="font-semibold text-[#646262]">Jatuh Tempo</label>
               <input
                 type="date"
-                className="w-full p-2 border rounded cursor-pointer"
+                className="w-full p-2 border rounded-[10px] cursor-pointer"
                 value={data.jatuh_tempo}
                 onChange={(e) => setData('jatuh_tempo', e.target.value)}
               />
@@ -115,18 +115,19 @@ export default function Invoice({ products = [], customers = [] }) {
             <div className="flex-1 min-w-[200px] flex flex-col gap-2">
               <label className="font-semibold text-[#646262]">Status Pembayaran</label>
               <select
-                className="w-full p-2 border rounded cursor-pointer"
+                className="w-full p-2 border rounded-[10px] cursor-pointer"
                 value={data.status}
                 onChange={(e) => setData('status', e.target.value)}
               >
-                <option value="Belum dibayar">Belum dibayar</option>
+                <option value="Draft">Draft</option>
                 <option value="Dibayar sebagian">Dibayar sebagian</option>
                 <option value="Lunas">Lunas</option>
+                <option value="Dibatalkan">Dibatalkan</option>
               </select>
             </div>
           </div>
         </div>
-        <div className={`bg-white flex flex-col gap-4 p-4 rounded-xl shadow-md ${isMedium ? "order-3" : ""}`}>
+        <div className={`bg-[#F6F6F6] flex flex-col gap-4 p-6 rounded-xl ${isMedium ? "order-3" : ""}`}>
           <div>
             <label className="block text-sm text-[#646262] font-semibold">Diskon</label>
             <input
@@ -134,7 +135,7 @@ export default function Invoice({ products = [], customers = [] }) {
               inputMode="numeric"
               value={data.diskon === 0 ? "" : data.diskon} 
               onChange={(e) => setData('diskon', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded-[10px] mt-1"
             />
           </div>
           <div>
@@ -144,7 +145,7 @@ export default function Invoice({ products = [], customers = [] }) {
               inputMode="numeric"
               value={data.ongkir === 0 ? "" : data.ongkir}
               onChange={(e) => setData('ongkir', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded-[10px] mt-1"
             />
           </div>
           <div>
@@ -154,7 +155,7 @@ export default function Invoice({ products = [], customers = [] }) {
               inputMode="numeric"
               value={data.tax === 0 ? "" : data.tax}
               onChange={(e) => setData('tax', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
-              className="w-full p-2 border rounded mt-1"
+              className="w-full p-2 border rounded-[10px] mt-1"
             />
           </div>
           <div className="mt-10 flex flex-col gap-4">
@@ -186,9 +187,9 @@ export default function Invoice({ products = [], customers = [] }) {
               <tbody>
                 {rows.map((row, index) => (
                   <tr key={index}>
-                    <td className="p-1 min-w-[150px]">
+                    <td className="p-1 min-w-[200px]">
                       <select
-                        className="w-full border bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-md p-2"
+                        className="min-w-[200px] w-full border-2 bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-[7px] p-2"
                         value={row.name}
                         onChange={(e) => updateRow(index, "id", e.target.value)}
                       >
@@ -203,12 +204,20 @@ export default function Invoice({ products = [], customers = [] }) {
                         type="text"
                         inputMode="number"
                         value={row.kuantitas}
-                        className="w-full p-2 border bg-[#FCFDFD] border-[#D5D5D5] rounded-md"
+                        className="w-[60px] p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]"
                         onChange={(e) => updateRow(index, "kuantitas", e.target.value)}
                       />
                     </td>
-                    <td className="p-2 w-[110px] text-center">{productPrices[row.produk_id] ? formatToRupiah(productPrices[row.produk_id]) : "-"}</td>
-                    <td className="p-2 w-[110px] text-center">{formatToRupiah(row.total)}</td>
+                    <td className="p-2 w-[110px] text-center">
+                      <div className="p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]">
+                        {productPrices[row.produk_id] ? formatToRupiah(productPrices[row.produk_id]) : "-"}
+                      </div>
+                    </td>
+                    <td className="p-2 w-[110px] text-center">
+                      <div className="p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]">
+                        {formatToRupiah(row.total)}
+                      </div>
+                    </td>
                     <td className="p-2 text-center">
                       <button onClick={() => removeRow(index)} className="text-red-500 cursor-pointer"><MdOutlineCancel size={24}/></button>
                     </td>

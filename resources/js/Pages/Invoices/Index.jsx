@@ -59,7 +59,9 @@ export default function Invoice({ invoices }) {
                 <TableData>
                   {formatToRupiah(invoice.total_bayar)}
                 </TableData>
-                <TableData>{invoice.status}</TableData>
+                <TableData>
+                  {invoice.status_terhitung}
+                </TableData>
                 <TableData className="px-1 w-[111px]">
                   <Button onClick={() => onDetailInvoice(invoice.id)} className="bg-[#33D1AB] text-[1rem]">
                     Detail

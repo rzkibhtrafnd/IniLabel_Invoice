@@ -45,12 +45,12 @@ class InvoiceController extends Controller
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'jatuh_tempo' => 'required|date',
-            'status' => 'required|in:Belum dibayar,Dibayar sebagian,Lunas',
+            'status' => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
-            'diskon' => 'required|numeric|min:0',
-            'ongkir' => 'required|numeric|min:0',
+            'diskon' => 'nullable|numeric|min:0',
+            'ongkir' => 'nullable|numeric|min:0',
         ]);
 
         $subtotal = collect($request->items)->sum(function ($item) {
@@ -98,12 +98,12 @@ class InvoiceController extends Controller
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'jatuh_tempo' => 'required|date',
-            'status' => 'required|in:Belum dibayar,Dibayar sebagian,Lunas',
+            'status' => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
-            'diskon' => 'required|numeric|min:0',
-            'ongkir' => 'required|numeric|min:0',
+            'diskon' => 'nullable|numeric|min:0',
+            'ongkir' => 'nullable|numeric|min:0',
         ]);
 
         $invoice->details()->delete();
