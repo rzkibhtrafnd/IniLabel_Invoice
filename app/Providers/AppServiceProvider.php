@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Request::macro('canManageUser', function () {
+            return auth()->user()?->can('manage-user');
+        });
+    
+        Inertia::share([
+            'canManageUser' => fn () => request()->canManageUser(),
+        ]);
     }
 }
