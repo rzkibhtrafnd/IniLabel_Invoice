@@ -12,6 +12,7 @@ import Button from "../../Components/Buttons";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
+import Pagination from "../../Components/Tables/Pagination";
 
 export default function Index({ users = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
@@ -86,52 +87,55 @@ export default function Index({ users = [] }) {
       </Heading>
 
       {users.data.length > 0 ? (
-        <Table data={users}>
-          <TableHead>
-            <TableHeader>No</TableHeader>
-            <TableHeader>Username</TableHeader>
-            <TableHeader>Email</TableHeader>
-            <TableHeader colSpan={3}>Aksi</TableHeader>
-          </TableHead>
-          <tbody>
-            {users.data.map((user, index) => (
-              <tr key={user.id}>
-                <TableData className="font-bold text-light-slate">
-                  {index + 1}
-                </TableData>
-                <TableData className="text-nowrap">{user.username}</TableData>
-                <TableData>{user.email}</TableData>
-                <TableData className="px-1 w-[111px]">
-                  <Button
-                    onClick={() => handleDetailUser(user)}
-                    className="bg-[#33D1AB] text-[1rem]"
-                  >
-                    Detail
-                    <TbSearch size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[96px]">
-                  <Button
-                    onClick={() => handleEditUser(user)}
-                    className="bg-primary text-[1rem]"
-                  >
-                    Edit
-                    <TbEdit size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[115px]">
-                  <Button
-                    onClick={() => onDeleteUser(user.id)}
-                    className="bg-[#D30368] text-[1rem]"
-                  >
-                    Hapus
-                    <MdOutlineCancel size={24} />
-                  </Button>
-                </TableData>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <>
+          <Table>
+            <TableHead>
+              <TableHeader>No</TableHeader>
+              <TableHeader>Username</TableHeader>
+              <TableHeader>Email</TableHeader>
+              <TableHeader colSpan={3}>Aksi</TableHeader>
+            </TableHead>
+            <tbody>
+              {users.data.map((user, index) => (
+                <tr key={user.id}>
+                  <TableData className="font-bold text-light-slate">
+                    {index + 1}
+                  </TableData>
+                  <TableData className="text-nowrap">{user.username}</TableData>
+                  <TableData>{user.email}</TableData>
+                  <TableData className="px-1 w-[111px]">
+                    <Button
+                      onClick={() => handleDetailUser(user)}
+                      className="bg-[#33D1AB] text-[1rem]"
+                    >
+                      Detail
+                      <TbSearch size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[96px]">
+                    <Button
+                      onClick={() => handleEditUser(user)}
+                      className="bg-primary text-[1rem]"
+                    >
+                      Edit
+                      <TbEdit size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[115px]">
+                    <Button
+                      onClick={() => onDeleteUser(user.id)}
+                      className="bg-[#D30368] text-[1rem]"
+                    >
+                      Hapus
+                      <MdOutlineCancel size={24} />
+                    </Button>
+                  </TableData>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination data={users} />
+        </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data user.</p>
       )}

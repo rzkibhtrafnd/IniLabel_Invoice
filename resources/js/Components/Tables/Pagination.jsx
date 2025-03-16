@@ -50,7 +50,7 @@ export default function Pagination({ data }) {
   const displayedPages = getDisplayedPages();
 
   return (
-    <div className="flex p-8 w-fit space-x-1">
+    <div className="flex justify-center space-x-1">
       <button
         onClick={() => router.visit(data.prev_page_url)}
         className={`px-3 py-1 text-[#4D4FED] ${

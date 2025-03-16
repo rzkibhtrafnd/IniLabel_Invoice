@@ -11,6 +11,7 @@ import { TbEdit, TbSearch } from "react-icons/tb";
 import { MdOutlineCancel } from "react-icons/md";
 import formatToRupiah from "../../utils/formatToRupiah";
 import Status from "../../Components/Status";
+import Pagination from "../../Components/Tables/Pagination";
 
 export default function Invoice({ invoices }) {
   const { get, delete: destroy } = useForm();
@@ -40,53 +41,56 @@ export default function Invoice({ invoices }) {
       </Heading>
 
       {invoices.data.length > 0 ? (
-        <Table data={invoices}>
-          <TableHead>
-            <TableHeader>Id</TableHeader>
-            <TableHeader>Customer</TableHeader>
-            <TableHeader>Total Harga</TableHeader>
-            <TableHeader>Status</TableHeader>
-            <TableHeader colSpan={3}>Aksi</TableHeader>
-          </TableHead>
-          <tbody>
-            {invoices.data.map((invoice) => (
-              <tr key={invoice.id}>
-                <TableData className="font-bold text-light-slate">
-                  {invoice.id}
-                </TableData>
-                <TableData className="text-nowrap">
-                  {invoice.customer.name}
-                </TableData>
-                <TableData>
-                  {formatToRupiah(invoice.total_bayar)}
-                </TableData>
-                <TableData className="text-nowrap">
-                  <Status>
-                    {invoice.status_terhitung}
-                  </Status>
-                </TableData>
-                <TableData className="px-1 w-[111px]">
-                  <Button onClick={() => onDetailInvoice(invoice.id)} className="bg-[#33D1AB] text-[1rem]">
-                    Detail
-                    <TbSearch size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[96px]">
-                  <Button onClick={() => onUpdateInvoice(invoice.id)} className="bg-primary text-[1rem]">
-                    Edit
-                    <TbEdit size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[115px]">
-                  <Button onClick={() => onDeleteInvoice(invoice.id)} className="bg-[#D30368] text-[1rem]">
-                    Hapus
-                    <MdOutlineCancel size={24} />
-                  </Button>
-                </TableData>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <>
+          <Table data={invoices}>
+            <TableHead>
+              <TableHeader>Id</TableHeader>
+              <TableHeader>Customer</TableHeader>
+              <TableHeader>Total Harga</TableHeader>
+              <TableHeader>Status</TableHeader>
+              <TableHeader colSpan={3}>Aksi</TableHeader>
+            </TableHead>
+            <tbody>
+              {invoices.data.map((invoice) => (
+                <tr key={invoice.id}>
+                  <TableData className="font-bold text-light-slate">
+                    {invoice.id}
+                  </TableData>
+                  <TableData className="text-nowrap">
+                    {invoice.customer.name}
+                  </TableData>
+                  <TableData>
+                    {formatToRupiah(invoice.total_bayar)}
+                  </TableData>
+                  <TableData className="text-nowrap">
+                    <Status>
+                      {invoice.status_terhitung}
+                    </Status>
+                  </TableData>
+                  <TableData className="px-1 w-[111px]">
+                    <Button onClick={() => onDetailInvoice(invoice.id)} className="bg-[#33D1AB] text-[1rem]">
+                      Detail
+                      <TbSearch size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[96px]">
+                    <Button onClick={() => onUpdateInvoice(invoice.id)} className="bg-primary text-[1rem]">
+                      Edit
+                      <TbEdit size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[115px]">
+                    <Button onClick={() => onDeleteInvoice(invoice.id)} className="bg-[#D30368] text-[1rem]">
+                      Hapus
+                      <MdOutlineCancel size={24} />
+                    </Button>
+                  </TableData>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination data={invoices} />
+        </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data invoice.</p>
       )}

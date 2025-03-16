@@ -12,6 +12,7 @@ import Button from "../../Components/Buttons";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
+import Pagination from "../../Components/Tables/Pagination";
 
 export default function Index({ customers = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
@@ -83,54 +84,57 @@ export default function Index({ customers = [] }) {
       </Heading>
 
       {customers.data.length > 0 ? (
-        <Table data={customers}>
-          <TableHead>
-            <TableHeader>No</TableHeader>
-            <TableHeader>Nama</TableHeader>
-            <TableHeader>Email</TableHeader>
-            <TableHeader>Telepon</TableHeader>
-            <TableHeader colSpan={3}>Aksi</TableHeader>
-          </TableHead>
-          <tbody>
-            {customers.data.map((customer, index) => (
-              <tr key={customer.id}>
-                <TableData className="font-bold text-light-slate">
-                  {index + 1}
-                </TableData>
-                <TableData className="text-nowrap">{customer.name}</TableData>
-                <TableData>{customer.email}</TableData>
-                <TableData>{customer.phone}</TableData>
-                <TableData className="px-1 w-[111px]">
-                  <Button
-                    onClick={() => handleDetailCustomer(customer)}
-                    className="bg-[#33D1AB] text-[1rem]"
-                  >
-                    Detail
-                    <TbSearch size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[96px]">
-                  <Button
-                    onClick={() => handleEditCustomer(customer)}
-                    className="bg-primary text-[1rem]"
-                  >
-                    Edit
-                    <TbEdit size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[115px]">
-                  <Button
-                    onClick={() => onDeleteCustomer(customer.id)}
-                    className="bg-[#D30368] text-[1rem]"
-                  >
-                    Hapus
-                    <MdOutlineCancel size={24} />
-                  </Button>
-                </TableData>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <>
+          <Table>
+            <TableHead>
+              <TableHeader>No</TableHeader>
+              <TableHeader>Nama</TableHeader>
+              <TableHeader>Email</TableHeader>
+              <TableHeader>Telepon</TableHeader>
+              <TableHeader colSpan={3}>Aksi</TableHeader>
+            </TableHead>
+            <tbody>
+              {customers.data.map((customer, index) => (
+                <tr key={customer.id}>
+                  <TableData className="font-bold text-light-slate">
+                    {index + 1}
+                  </TableData>
+                  <TableData className="text-nowrap">{customer.name}</TableData>
+                  <TableData>{customer.email}</TableData>
+                  <TableData>{customer.phone}</TableData>
+                  <TableData className="px-1 w-[111px]">
+                    <Button
+                      onClick={() => handleDetailCustomer(customer)}
+                      className="bg-[#33D1AB] text-[1rem]"
+                    >
+                      Detail
+                      <TbSearch size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[96px]">
+                    <Button
+                      onClick={() => handleEditCustomer(customer)}
+                      className="bg-primary text-[1rem]"
+                    >
+                      Edit
+                      <TbEdit size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[115px]">
+                    <Button
+                      onClick={() => onDeleteCustomer(customer.id)}
+                      className="bg-[#D30368] text-[1rem]"
+                    >
+                      Hapus
+                      <MdOutlineCancel size={24} />
+                    </Button>
+                  </TableData>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination data={customers} />
+        </>
       ) : (
         <p className="text-center text-gray-500 mt-4">
           Tidak ada data customer.

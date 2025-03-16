@@ -13,6 +13,7 @@ import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
 import { MdOutlineCancel } from "react-icons/md";
 import formatToRupiah from "../../utils/formatToRupiah";
+import Pagination from "../../Components/Tables/Pagination";
 
 export default function Index({ products = [] }) {
   const { isOpen, openPopup, closePopup } = usePopup();
@@ -84,56 +85,59 @@ export default function Index({ products = [] }) {
       </Heading>
 
       {products.data.length > 0 ? (
-        <Table data={products}>
-          <TableHead>
-            <TableHeader>No</TableHeader>
-            <TableHeader>Nama</TableHeader>
-            <TableHeader>Harga</TableHeader>
-            <TableHeader>Stok</TableHeader>
-            <TableHeader colSpan={3}>Aksi</TableHeader>
-          </TableHead>
-          <tbody>
-            {products.data.map((product, index) => (
-              <tr key={product.id}>
-                <TableData className="font-bold text-light-slate">
-                  {index + 1}
-                </TableData>
-                <TableData className="text-nowrap">{product.name}</TableData>
-                <TableData>
-                  {formatToRupiah(product.price)}
-                </TableData>
-                <TableData>{product.stock}</TableData>
-                <TableData className="px-1 w-[111px]">
-                  <Button
-                    onClick={() => handleDetailProduct(product)}
-                    className="bg-[#33D1AB] text-[1rem]"
-                  >
-                    Detail
-                    <TbSearch size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[96px]">
-                  <Button
-                    onClick={() => handleEditProduct(product)}
-                    className="bg-primary text-[1rem]"
-                  >
-                    Edit
-                    <TbEdit size={24} />
-                  </Button>
-                </TableData>
-                <TableData className="px-1 w-[115px]">
-                  <Button
-                    onClick={() => onDeleteProduct(product.id)}
-                    className="bg-[#D30368] text-[1rem]"
-                  >
-                    Hapus
-                    <MdOutlineCancel size={24} />
-                  </Button>
-                </TableData>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <>
+          <Table>
+            <TableHead>
+              <TableHeader>No</TableHeader>
+              <TableHeader>Nama</TableHeader>
+              <TableHeader>Harga</TableHeader>
+              <TableHeader>Stok</TableHeader>
+              <TableHeader colSpan={3}>Aksi</TableHeader>
+            </TableHead>
+            <tbody>
+              {products.data.map((product, index) => (
+                <tr key={product.id}>
+                  <TableData className="font-bold text-light-slate">
+                    {index + 1}
+                  </TableData>
+                  <TableData className="text-nowrap">{product.name}</TableData>
+                  <TableData>
+                    {formatToRupiah(product.price)}
+                  </TableData>
+                  <TableData>{product.stock}</TableData>
+                  <TableData className="px-1 w-[111px]">
+                    <Button
+                      onClick={() => handleDetailProduct(product)}
+                      className="bg-[#33D1AB] text-[1rem]"
+                    >
+                      Detail
+                      <TbSearch size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[96px]">
+                    <Button
+                      onClick={() => handleEditProduct(product)}
+                      className="bg-primary text-[1rem]"
+                    >
+                      Edit
+                      <TbEdit size={24} />
+                    </Button>
+                  </TableData>
+                  <TableData className="px-1 w-[115px]">
+                    <Button
+                      onClick={() => onDeleteProduct(product.id)}
+                      className="bg-[#D30368] text-[1rem]"
+                    >
+                      Hapus
+                      <MdOutlineCancel size={24} />
+                    </Button>
+                  </TableData>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination data={products} />
+        </>
       ) : (
         <p className="text-center text-gray-500 mt-4">
           Tidak ada data produk.
