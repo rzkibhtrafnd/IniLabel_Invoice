@@ -41,7 +41,7 @@ class AdminController extends Controller
             'alamat'    => $validated['alamat'] ?? null,
         ]);
 
-        return Redirect::route('users.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('users.index')->with('message', 'Succes.Data Berhasil Disimpan!');
     }
 
     public function update(Request $request, User $user)
@@ -62,7 +62,7 @@ class AdminController extends Controller
             'alamat'    => $validated['alamat'] ?? $user->alamat,
         ]);
 
-        return Redirect::route('users.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('users.index')->with('message', 'Succes.Data Berhasil Disimpan!');
     }
 
     public function destroy(User $user)

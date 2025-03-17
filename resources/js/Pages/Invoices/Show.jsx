@@ -70,6 +70,9 @@ export default function Invoice({ invoice = [] }) {
             <a href={`/invoices/${invoice.id}/download`} className="bg-[#01669E] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center">
               Download PDF
             </a>
+            <a href={`/invoices/${invoice.id}/send-email`} className="bg-green-600 text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center">
+            Kirim Email Invoice
+            </a>
           </div>
         </div>
         <div className={`flex flex-col gap-2 ${isMedium ? "order-2" : "col-span-2"}`}>
