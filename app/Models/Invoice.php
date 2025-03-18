@@ -45,4 +45,9 @@ class Invoice extends Model
         }
         return $this->status;
     }
+
+    public function receipts()
+    {
+        return $this->hasMany(Receipts::class);
+    }
 }

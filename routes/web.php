@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ReceiptController;
 
 Route::get('/login', function () {
     return redirect()->route('home');
@@ -24,4 +25,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('invoices', InvoiceController::class);
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadInvoice'])->name('invoices.download');
     Route::get('/invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.sendEmail');
+    Route::resource('receipts', ReceiptController::class);
+    Route::get('/receipts/{receipt}/download', [ReceiptController::class, 'downloadReceipt'])->name('receipts.download');
 });
