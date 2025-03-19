@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import Button from "../../Components/Buttons";
 import Input from "../../Components/Input";
 import { useEffect } from "react";
+import FlashMessage from "../../Components/FlashMessage";
 
 export default function Login({ flash }) {
   const { data, setData, post, processing } = useForm({
@@ -20,32 +21,9 @@ export default function Login({ flash }) {
     post('/login', data);
   }
 
-  useEffect(() => {
-    if (flash?.message) {
-      Swal.fire({
-        toast: true,
-        position: "top-end",
-        icon: flash.message.includes("berhasil") ? "success" : "error",
-        title: flash.message,
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        showClass: {
-          popup: "swal2-noanimation swal2-slide-in-right",
-        },
-        hideClass: {
-          popup: "swal2-noanimation swal2-slide-out-right",
-        },
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-    }
-  }, [flash]);
-
   return (
     <div className="flex min-h-screen items-center justify-center">
+      <FlashMessage />
       <Head title="Login" />
       <div className="w-full gap-4 flex flex-col bg-[#F6F6F6] border border-[#5882C1] max-w-md p-10 rounded-lg">
         <img
@@ -87,7 +65,7 @@ export default function Login({ flash }) {
           <Button
             type="submit"
             disabled={processing}
-            className={`w-full flex justify-center text-center rounded-lg transition duration-300 
+            className={`w-full flex justify-center text-center text-white rounded-lg transition duration-300 
             ${processing ? "bg-gray-400 cursor-not-allowed" : "bg-[#003465] hover:bg-[#00234a]"}`}
           >
             {processing ? "Memproses..." : "Masuk"}

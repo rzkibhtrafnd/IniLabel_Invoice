@@ -29,10 +29,10 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard')->with('message', 'Success. Login berhasil.');
         }
 
-        return back()->with('message', 'Email atau password salah.');
+        return back()->with('message', 'Gagal. Email atau password salah.');
     }
 
     public function logout(Request $request)

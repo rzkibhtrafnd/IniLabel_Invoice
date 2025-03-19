@@ -11,5 +11,5 @@ export default function usePopup() {
     setIsOpen(false);
   }
 
-  return { isOpen, openPopup, closePopup };
+  return [ isOpen, openPopup, closePopup ];
 }

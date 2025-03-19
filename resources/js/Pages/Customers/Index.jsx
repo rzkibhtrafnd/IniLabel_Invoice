@@ -1,4 +1,4 @@
-import { Head, router, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import Heading from "../../Components/Heading";
@@ -6,25 +6,22 @@ import Table from "../../Components/Tables/Table";
 import TableHead from "../../Components/Tables/TableHead";
 import TableHeader from "../../Components/Tables/TableHeader";
 import TableData from "../../Components/Tables/TableData";
-import Popup from "../../Components/Popup";
 import usePopup from "../../hooks/usePopup";
 import Button from "../../Components/Buttons";
 import { TbEdit, TbSearch } from "react-icons/tb";
 import { BsPlusCircle } from "react-icons/bs";
-import { MdOutlineCancel } from "react-icons/md";
 import Pagination from "../../Components/Tables/Pagination";
 import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
+import FormPopup from "../../Components/Popup/FormPopup";
+import DetailPopup from "../../Components/Popup/DetailPopup";
 
 export default function Index({ customers = [] }) {
-  const { isOpen, openPopup, closePopup } = usePopup();
-  const { data, setData, reset, processing, delete: destroy } = useForm({
-    id: "",
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
+  const [isFormOpen, openFormPopup, closeFormPopup] = usePopup();
+  const [isDetailOpen, openDetailPopup, closeDetailPopup] = usePopup();
+  const { data, setData, reset, post, put, processing, delete: destroy } = useForm({
+    id: "", name: "", email: "", phone: "", address: "",
   });
-  const [mode, setMode] = useState("create");
+  const [mode, setMode] = useState("Tambah");
 
   function handleChange(e) {
     setData(e.target.id, e.target.value);
@@ -32,49 +29,37 @@ export default function Index({ customers = [] }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (mode === "edit") {
-      router.put(`/customers/${data.id}`, data);
-    } else if (mode === "create") {
-      router.post("/customers", data);
+    if (mode === "Edit") {
+      put(`/customers/${data.id}`, data);
+    } else if (mode === "Tambah") {
+      post("/customers", data);
     }
-    closePopup();
+    closeFormPopup();
   }
 
   function handleAddCustomer() {
     reset();
-    setMode("create");
-    openPopup();
+    setMode("Tambah");
+    openFormPopup();
   }
 
   function handleEditCustomer(customer) {
-    setData({
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      address: customer.address,
-    });
-    setMode("edit");
-    openPopup();
+    setData({ ...customer });
+    setMode("Edit");
+    openFormPopup();
   }
 
   function handleDetailCustomer(customer) {
-    setData({
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      address: customer.address,
-    });
-    setMode("detail");
-    openPopup();
+    setData({ ...customer });
+    setMode("Detail");
+    openDetailPopup();
   }
 
   return (
     <DashboardLayout>
       <Head title="Customer" />
       <Heading title="Data Customer" subTitle="customer">
-        <Button onClick={handleAddCustomer} className="bg-[#01669E]">
+        <Button onClick={handleAddCustomer} className="bg-[#01669E] text-white">
           Tambah
           <BsPlusCircle size={24} />
         </Button>
@@ -93,36 +78,24 @@ export default function Index({ customers = [] }) {
             <tbody>
               {customers.data.map((customer, index) => (
                 <tr key={customer.id}>
-                  <TableData className="font-bold text-light-slate">
-                    {index + 1}
-                  </TableData>
+                  <TableData className="font-bold text-light-slate">{index + 1}</TableData>
                   <TableData className="text-nowrap">{customer.name}</TableData>
                   <TableData>{customer.email}</TableData>
                   <TableData>{customer.phone}</TableData>
                   <TableData className="px-1 w-[111px]">
-                    <Button
-                      onClick={() => handleDetailCustomer(customer)}
-                      className="bg-[#33D1AB] text-[1rem]"
-                    >
+                    <Button onClick={() => handleDetailCustomer(customer)} className="bg-[#33D1AB] text-white text-[1rem]">
                       Detail
                       <TbSearch size={24} />
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[96px]">
-                    <Button
-                      onClick={() => handleEditCustomer(customer)}
-                      className="bg-primary text-[1rem]"
-                    >
+                    <Button onClick={() => handleEditCustomer(customer)} className="bg-primary text-white text-[1rem]">
                       Edit
                       <TbEdit size={24} />
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <ConfirmPopup
-                      title="Hapus Customer?" 
-                      text="Apakah Anda yakin ingin menghapus Customer ini?" 
-                      onConfirm={() => destroy(`/customers/${customer.id}`)}
-                    />
+                    <ConfirmPopup title="Hapus Customer?" text="Apakah Anda yakin ingin menghapus Customer ini?" onConfirm={() => destroy(`/customers/${customer.id}`)} />
                   </TableData>
                 </tr>
               ))}
@@ -131,87 +104,37 @@ export default function Index({ customers = [] }) {
           <Pagination data={customers} />
         </>
       ) : (
-        <p className="text-center text-gray-500 mt-4">
-          Tidak ada data customer.
-        </p>
+        <p className="text-center text-gray-500 mt-4">Tidak ada data customer.</p>
       )}
 
-      {isOpen && (
-        <Popup>
-          <h2 className="text-lg font-bold mb-4">
-            {mode === "edit"
-              ? "Edit Customer"
-              : mode === "detail"
-              ? "Detail Customer"
-              : "Tambah Customer"}
-          </h2>
-          <form onSubmit={handleSubmit}>
-            <input type="hidden" id="id" value={data.id} />
+      {isFormOpen && (
+        <FormPopup
+          title={`${mode} Customer`}
+          closePopup={closeFormPopup}
+          handleSubmit={handleSubmit}
+          data={data}
+          handleChange={handleChange}
+          fields={[
+            { id: "name", type: "text", placeholder: "Nama Lengkap", required: true },
+            { id: "email", type: "email", placeholder: "Email", required: true },
+            { id: "phone", type: "text", placeholder: "Nomor Telepon", required: true },
+            { id: "address", type: "text", placeholder: "Alamat", required: true }
+          ]}
+        />
+      )}
 
-            <input
-              type="text"
-              id="name"
-              placeholder="Nama Lengkap"
-              autoComplete="off"
-              value={data.name}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mb-3"
-              required
-              disabled={mode === "detail"}
-            />
-            <input
-              type="email"
-              id="email"
-              placeholder="Email"
-              autoComplete="off"
-              value={data.email}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mb-3"
-              required
-              disabled={mode === "detail"}
-            />
-            <input
-              type="text"
-              id="phone"
-              placeholder="Nomor Telepon"
-              autoComplete="off"
-              value={data.phone}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mb-3"
-              required
-              disabled={mode === "detail"}
-            />
-            <input
-              type="text"
-              id="address"
-              placeholder="Alamat"
-              autoComplete="off"
-              value={data.address}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mb-3"
-              required
-              disabled={mode === "detail"}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closePopup}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Batal
-              </button>
-              {mode !== "detail" && (
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary text-white rounded"
-                  disabled={processing}
-                >
-                  {processing ? "Menyimpan..." : "Simpan"}
-                </button>
-              )}
-            </div>
-          </form>
-        </Popup>
+      {isDetailOpen && (
+        <DetailPopup
+          title="Detail Customer"
+          closePopup={closeDetailPopup}
+          data={data}
+          fields={[
+            { id: "name", placeholder: "Nama Lengkap" },
+            { id: "email", placeholder: "Email" },
+            { id: "phone", placeholder: "Nomor Telepon" },
+            { id: "address", placeholder: "Alamat" }
+          ]}
+        />
       )}
     </DashboardLayout>
   );

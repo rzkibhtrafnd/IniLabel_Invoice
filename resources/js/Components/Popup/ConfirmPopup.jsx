@@ -45,7 +45,7 @@ export default function ConfirmPopup({ title, text, onConfirm }) {
   };
 
   return (
-    <Button onClick={showDialog} className="bg-[#D30368] text-[1rem]">
+    <Button onClick={showDialog} className="bg-[#D30368] text-white text-[1rem]">
       Hapus
       <MdOutlineCancel size={24} />
     </Button>

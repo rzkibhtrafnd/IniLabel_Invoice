@@ -29,7 +29,7 @@ export default function Invoice({ invoices }) {
       <Head title="Invoice" />
       <Heading title="Data Invoice" subTitle="Invoice">
         <Link href="/invoices/create">
-          <Button className="bg-[#01669E]">
+          <Button className="text-white bg-[#01669E]">
             Tambah
             <BsPlusCircle size={24} />
           </Button>
@@ -64,13 +64,13 @@ export default function Invoice({ invoices }) {
                     </Status>
                   </TableData>
                   <TableData className="px-1 w-[111px]">
-                    <Button onClick={() => onDetailInvoice(invoice.id)} className="bg-[#33D1AB] text-[1rem]">
+                    <Button onClick={() => onDetailInvoice(invoice.id)} className="bg-[#33D1AB] text-white text-[1rem]">
                       Detail
                       <TbSearch size={24} />
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[96px]">
-                    <Button onClick={() => onUpdateInvoice(invoice.id)} className="bg-primary text-[1rem]">
+                    <Button onClick={() => onUpdateInvoice(invoice.id)} className="bg-primary text-white text-[1rem]">
                       Edit
                       <TbEdit size={24} />
                     </Button>
