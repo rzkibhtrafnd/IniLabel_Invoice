@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { usePage, Link, useForm } from "@inertiajs/react";
 import { FaBars } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
-import { IoBagRemoveOutline, IoLogOutOutline } from "react-icons/io5";
+import { IoBagRemoveOutline, IoLogOutOutline, IoSettingsOutline } from "react-icons/io5";
 import { HiOutlineUserGroup, HiOutlineUserCircle } from "react-icons/hi2";
 import { PiInvoice } from "react-icons/pi";
 import { TfiReceipt } from "react-icons/tfi";
@@ -61,6 +61,7 @@ export default function Header() {
     { href: "/products", icon: IoBagRemoveOutline, label: "Produk", isShow: true, componentName: "Products" },
     { href: "/invoices", icon: PiInvoice, label: "Invoice", isShow: true, componentName: "Invoices" },
     { href: "/receipts", icon: TfiReceipt, label: "Receipt", isShow: true, componentName: "Receipts" },
+    { href: "/settings", icon: IoSettingsOutline, label: "Setting", isShow: true, componentName: "Settings" },
   ];
 
   return (

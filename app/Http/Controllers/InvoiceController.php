@@ -27,6 +27,8 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
+        $invoice->load(['customer', 'details.product']);
+        // return view('emails.invoice', compact('invoice'));
         return Inertia::render('Invoices/Show', [
             'invoice' => $invoice->load(['customer', 'details.product']),
         ]);

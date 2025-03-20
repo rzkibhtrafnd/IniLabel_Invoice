@@ -18,50 +18,44 @@ import DetailPopup from "../../Components/Popup/DetailPopup";
 export default function Index({ customers = [] }) {
   const [isFormOpen, openFormPopup, closeFormPopup] = usePopup();
   const [isDetailOpen, openDetailPopup, closeDetailPopup] = usePopup();
+  const [mode, setMode] = useState("Tambah");
+  
   const { data, setData, reset, post, put, processing, delete: destroy } = useForm({
     id: "", name: "", email: "", phone: "", address: "",
   });
-  const [mode, setMode] = useState("Tambah");
 
-  function handleChange(e) {
-    setData(e.target.id, e.target.value);
-  }
+  const handleChange = (e) => setData(e.target.id, e.target.value);
 
-  function handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (mode === "Edit") {
-      put(`/customers/${data.id}`, data);
-    } else if (mode === "Tambah") {
-      post("/customers", data);
-    }
+    mode === "Edit" ? put(`/customers/${data.id}`, data) : post("/customers", data);
     closeFormPopup();
-  }
+  };
 
-  function handleAddCustomer() {
+  const handleAddCustomer = () => {
     reset();
     setMode("Tambah");
     openFormPopup();
-  }
+  };
 
-  function handleEditCustomer(customer) {
+  const handleEditCustomer = (customer) => {
     setData({ ...customer });
     setMode("Edit");
     openFormPopup();
-  }
+  };
 
-  function handleDetailCustomer(customer) {
+  const handleDetailCustomer = (customer) => {
     setData({ ...customer });
     setMode("Detail");
     openDetailPopup();
-  }
+  };
 
   return (
     <DashboardLayout>
       <Head title="Customer" />
       <Heading title="Data Customer" subTitle="customer">
         <Button onClick={handleAddCustomer} className="bg-[#01669E] text-white">
-          Tambah
-          <BsPlusCircle size={24} />
+          Tambah <BsPlusCircle size={24} />
         </Button>
       </Heading>
 
@@ -84,18 +78,20 @@ export default function Index({ customers = [] }) {
                   <TableData>{customer.phone}</TableData>
                   <TableData className="px-1 w-[111px]">
                     <Button onClick={() => handleDetailCustomer(customer)} className="bg-[#33D1AB] text-white text-[1rem]">
-                      Detail
-                      <TbSearch size={24} />
+                      Detail <TbSearch size={24} />
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[96px]">
                     <Button onClick={() => handleEditCustomer(customer)} className="bg-primary text-white text-[1rem]">
-                      Edit
-                      <TbEdit size={24} />
+                      Edit <TbEdit size={24} />
                     </Button>
                   </TableData>
                   <TableData className="px-1 w-[115px]">
-                    <ConfirmPopup title="Hapus Customer?" text="Apakah Anda yakin ingin menghapus Customer ini?" onConfirm={() => destroy(`/customers/${customer.id}`)} />
+                    <ConfirmPopup 
+                      title="Hapus Customer?" 
+                      text="Apakah Anda yakin ingin menghapus Customer ini?" 
+                      onConfirm={() => destroy(`/customers/${customer.id}`)} 
+                    />
                   </TableData>
                 </tr>
               ))}
