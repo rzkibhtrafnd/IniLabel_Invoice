@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\DetailInvoice;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Setting;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -28,58 +29,66 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['customer', 'details.product']);
-        // return view('emails.invoice', compact('invoice'));
         return Inertia::render('Invoices/Show', [
-            'invoice' => $invoice->load(['customer', 'details.product']),
+            'invoice' => $invoice,
         ]);
     }
 
-
     public function create()
     {
+        $setting = Setting::first();
         return Inertia::render('Invoices/Create', [
-            'customers' => Customer::all(['id', 'name']),
-            'products' => Product::all(['id', 'name', 'price']),
+            'customers'     => Customer::all(),
+            'products'      => Product::all(),
+            'taxPercentage' => $setting->tax ?? 0,
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'jatuh_tempo' => 'required|date',
-            'status' => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
-            'items' => 'required|array|min:1',
+            'customer_id'       => 'required|exists:customers,id',
+            'jatuh_tempo'       => 'required|date',
+            'status'            => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
+            'items'             => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
-            'diskon' => 'nullable|numeric|min:0',
-            'ongkir' => 'nullable|numeric|min:0',
+            'diskon'            => 'nullable|numeric|min:0',
+            'ongkir'            => 'nullable|numeric|min:0',
         ]);
 
+        $setting = Setting::first();
+        $taxPercentage = $setting ? $setting->tax : 0;
+        $diskon = $request->diskon ?? 0;
+        $ongkir = $request->ongkir ?? 0;
+
         $subtotal = collect($request->items)->sum(function ($item) {
-            return $item['kuantitas'] * Product::find($item['produk_id'])->price;
+            $product = Product::find($item['produk_id']);
+            return $item['kuantitas'] * $product->price;
         });
 
-        $total_bayar = $subtotal - $request->diskon + $request->ongkir;
+        $baseForTax = $subtotal - $diskon + $ongkir;
+        $taxValue   = round($baseForTax * ($taxPercentage / 100), 2);
+        $total_bayar = $baseForTax + $taxValue;
 
         $invoice = Invoice::create([
             'customer_id' => $request->customer_id,
-            'user_id' => Auth::id(),
+            'user_id'     => Auth::id(),
             'jatuh_tempo' => $request->jatuh_tempo,
             'total_harga' => $subtotal,
-            'diskon' => $request->diskon,
-            'ongkir' => $request->ongkir,
+            'diskon'      => $diskon,
+            'ongkir'      => $ongkir,
+            'tax'         => $taxValue,
             'total_bayar' => $total_bayar,
-            'status' => $request->status,
+            'status'      => $request->status,
         ]);
 
         foreach ($request->items as $item) {
             $product = Product::find($item['produk_id']);
-
             $invoice->details()->create([
-                'produk_id' => $item['produk_id'],
-                'kuantitas' => $item['kuantitas'],
-                'harga' => $product->price,
+                'produk_id'   => $item['produk_id'],
+                'kuantitas'   => $item['kuantitas'],
+                'harga'       => $product->price,
                 'total_harga' => $item['kuantitas'] * $product->price,
             ]);
         }
@@ -89,51 +98,61 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        $setting = Setting::first();
         return Inertia::render('Invoices/Edit', [
-            'invoice' => $invoice->load(['details.product']),
-            'customers' => Customer::all(['id', 'name']),
-            'products' => Product::all(['id', 'name', 'price']),
+            'invoice'       => $invoice->load(['details.product']),
+            'customers'     => Customer::all(),
+            'products'      => Product::all(),
+            'taxPercentage' => $setting->tax ?? 0,
         ]);
     }
 
     public function update(Request $request, Invoice $invoice)
     {
         $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'jatuh_tempo' => 'required|date',
-            'status' => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
-            'items' => 'required|array|min:1',
+            'customer_id'       => 'required|exists:customers,id',
+            'jatuh_tempo'       => 'required|date',
+            'status'            => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
+            'items'             => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
-            'diskon' => 'nullable|numeric|min:0',
-            'ongkir' => 'nullable|numeric|min:0',
+            'diskon'            => 'nullable|numeric|min:0',
+            'ongkir'            => 'nullable|numeric|min:0',
         ]);
 
         $invoice->details()->delete();
 
+        $setting = Setting::first();
+        $taxPercentage = $setting ? $setting->tax : 0;
+        $diskon = $request->diskon ?? 0;
+        $ongkir = $request->ongkir ?? 0;
+
         $subtotal = collect($request->items)->sum(function ($item) {
-            return $item['kuantitas'] * Product::find($item['produk_id'])->price;
+            $product = Product::find($item['produk_id']);
+            return $item['kuantitas'] * $product->price;
         });
 
-        $total_bayar = $subtotal - $request->diskon + $request->ongkir;
+        $baseForTax = $subtotal - $diskon + $ongkir;
+        $taxValue   = round($baseForTax * ($taxPercentage / 100), 2);
+        $total_bayar = $baseForTax + $taxValue;
 
         $invoice->update([
             'customer_id' => $request->customer_id,
             'jatuh_tempo' => $request->jatuh_tempo,
             'total_harga' => $subtotal,
-            'diskon' => $request->diskon,
-            'ongkir' => $request->ongkir,
+            'diskon'      => $diskon,
+            'ongkir'      => $ongkir,
+            'tax'         => $taxValue,
             'total_bayar' => $total_bayar,
-            'status' => $request->status,
+            'status'      => $request->status,
         ]);
 
         foreach ($request->items as $item) {
             $product = Product::find($item['produk_id']);
-
             $invoice->details()->create([
-                'produk_id' => $item['produk_id'],
-                'kuantitas' => $item['kuantitas'],
-                'harga' => $product->price,
+                'produk_id'   => $item['produk_id'],
+                'kuantitas'   => $item['kuantitas'],
+                'harga'       => $product->price,
                 'total_harga' => $item['kuantitas'] * $product->price,
             ]);
         }
@@ -150,30 +169,40 @@ class InvoiceController extends Controller
 
     public function downloadInvoice(Invoice $invoice)
     {
-        $invoice->load(['customer', 'details.product']);
+        // Muat relasi customer, user, details.product dan pengaturan
+        $invoice->load(['customer', 'user', 'details.product']);
+        $setting = Setting::first();
+        
+        // Gambar logo
         $imagePath = public_path('assets/logo.png');
         $imageData = base64_encode(file_get_contents($imagePath));
-        $imageSrc = 'data:image/png;base64,' . $imageData;
+        $imageSrc  = 'data:image/png;base64,' . $imageData;
 
-        $pdf = PDF::loadView('invoices.pdf', compact('invoice', 'imageSrc'))
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'imageSrc', 'setting'))
             ->setPaper('A4', 'portrait')
-            ->setOptions(['margin-left' => 0, 'margin-right' => 0, 'margin-top' => 0, 'margin-bottom' => 0]);
+            ->setOptions([
+                'margin-left'   => 0,
+                'margin-right'  => 0,
+                'margin-top'    => 0,
+                'margin-bottom' => 0,
+            ]);
 
-        // return view('invoices.pdf', compact('invoice', 'imageSrc'));
         return $pdf->download("Invoice_{$invoice->id}.pdf");
     }
 
     public function sendEmail(Invoice $invoice)
     {
-        // Pastikan relasi yang dibutuhkan termuat
-        $invoice->load(['customer', 'details.product']);
+        // Muat relasi customer, details.product, user dan pengaturan
+        $invoice->load(['customer', 'details.product', 'user']);
+        $setting = Setting::first();
 
-        // Generate PDF invoice (sama seperti pada method downloadInvoice)
+        // Gambar logo
         $imagePath = public_path('assets/logo.png');
         $imageData = base64_encode(file_get_contents($imagePath));
-        $imageSrc = 'data:image/png;base64,' . $imageData;
+        $imageSrc  = 'data:image/png;base64,' . $imageData;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.pdf', compact('invoice', 'imageSrc'))
+        // Sertakan data setting (misal: QRIS) pada PDF
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'imageSrc', 'setting'))
                 ->setPaper('A4', 'portrait')
                 ->setOptions([
                     'margin-left'   => 0,
@@ -184,10 +213,9 @@ class InvoiceController extends Controller
 
         $pdfContent = $pdf->output();
 
-        // Kirim email ke alamat customer yang tertera di invoice
-        \Mail::to($invoice->customer->email)->send(new \App\Mail\InvoiceEmail($invoice, $pdfContent));
+        // Kirim email dengan lampiran PDF dan sertakan juga QRIS dari pengaturan
+        \Mail::to($invoice->customer->email)->send(new InvoiceEmail($invoice, $pdfContent, $setting));
 
         return redirect()->back()->with('success', 'Email invoice telah dikirim ke ' . $invoice->customer->email);
     }
-
 }

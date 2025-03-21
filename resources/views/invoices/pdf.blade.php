@@ -29,36 +29,44 @@
     <table class="table-header">
       <tr>
         <td>
-          <h2>PT INILABEL SEJAHTERA</h2>
+          <h2>{{$setting->company_name}}</h2>
           <table>
             <tr>
               <th>No Invoice</th>
-              <td>: INV-0002</td>
+              <td>: INV-00{{$invoice->id}}</td>
             </tr>
             <tr>
               <th>Dicetak</th>
-              <td>: 02 Jan 2023</td>
+              <td>: {{ date('d M Y', strtotime($invoice->created_at)) }}</td>
             </tr>
             <tr>
-              <th>Dicetak</th>
-              <td>: 02 Jan 2023</td>
+              <th>Batas Bayar</th>
+              <td>: {{ date('d M Y', strtotime($invoice->jatuh_tempo)) }}</td>
             </tr>
             <tr>
-              <th>Dicetak</th>
-              <td>: 02 Jan 2023</td>
+              <th>Dibuat oleh</th>
+              <td>: {{ $invoice->user->username }}</td>
             </tr>
           </table>
         </td>
         <td>
-          <h2>PT INILABEL SEJAHTERA</h2>
+          <h2>INVOICE PEMESANAN</h2>
           <table>
             <tr>
-              <th>Cabang</th>
-              <td>: Surabaya</td>
+              <th>Nama Customer</th>
+              <td>: {{ $invoice->customer->name }}</td>
             </tr>
             <tr>
               <th>Email</th>
-              <td>: inilabel@mail.com</td>
+              <td>: {{ $invoice->customer->email }}</td>
+            </tr>
+            <tr>
+              <th>Nomor Telepon</th>
+              <td>: {{ $invoice->customer->phone }}</td>
+            </tr>
+            <tr>
+              <th>Alamat</th>
+              <td>: {{ $invoice->customer->address }}</td>
             </tr>
           </table>
         </td>
@@ -96,23 +104,23 @@
             <table>
               <tr>
                 <th style="text-align: left;">Sub Total:</th>
-                <td style="text-align: right;">Rp 10.000,00</td>
+                <td style="text-align: right;">Rp {{$invoice->total_harga}}</td>
               </tr>
               <tr>
-                <th style="text-align: left;">Potongan:</th>
-                <td style="text-align: right;">Rp 10.000,00</td>
+                <th style="text-align: left;">Diskon/Promo:</th>
+                <td style="text-align: right;">Rp {{$invoice->diskon}}</td>
               </tr>
               <tr>
-                <th style="text-align: left;">PPN 12%:</th>
-                <td style="text-align: right;">Rp 5.000,00</td>
+                <th style="text-align: left;">Ongkos Kirim:</th>
+                <td style="text-align: right;">Rp {{$invoice->ongkir}}</td>
               </tr>
               <tr>
-                <th style="text-align: left;">Biaya Pengiriman:</th>
-                <td style="text-align: right;">Rp 5.000,00</td>
+                <th style="text-align: left;">Pajak/Tax:</th>
+                <td style="text-align: right;">Rp {{$invoice->tax}}</td>
               </tr>
               <tr>
-                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total:</th>
-                <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">Rp 6.000.000,00</td>
+                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total Bayar:</th>
+                <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">Rp {{$invoice->total_bayar}}</td>
               </tr>
             </table>
           </div>
@@ -127,21 +135,27 @@
       <tr>
         <td>
           <p>Lakukan Pembayaran Sebelum Batas Akhir Yang Telah ditentukan</p>
-          <strong>Bank Bri</strong>
-          <p>3444291029</p>
-          <strong>Bank Mandiri</strong>
-          <p>99839382929</p>
+          @php
+            // Jika $setting->banks sudah berupa array, gunakan langsung; jika tidak, decode
+            $banks = is_array($setting->banks) ? $setting->banks : json_decode($setting->banks, true);
+          @endphp
+          @if($banks)
+            @foreach($banks as $bank)
+              <strong>{{ $bank['name'] }}</strong>
+              <p>{{ $bank['account_number'] }}</p>
+            @endforeach
+          @endif
         </td>
         <td>
-          <p>IniLabel – Penyedia Label Custom Berkualitas</p>
+          <p>{{$setting->company_name}} – {{$setting->slogan}}</p>
           <strong>Email</strong>
-          <p>mail@inilabel.com</p>
+          <p>{{ $invoice->user->email }}</p>
           <strong>Alamat</strong>
-          <p>0899485739</p>
-          <p>Untuk Pertanyaan Lebih Lanjut Bisa Menghubungi @inilabel.co</p>
+          <p>{{ $invoice->user->alamat }}</p>
+          <p>Untuk Pertanyaan Lebih Lanjut Bisa Menghubungi {{ $invoice->user->notelepon }}</p>
         </td>
       </tr>
     </table>
-  </footer>
+  </footer>  
 </body>
 </html>

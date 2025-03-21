@@ -17,6 +17,7 @@ class Invoice extends Model
         'total_harga',
         'diskon',
         'ongkir',
+        'tax',
         'total_bayar',
         'status',
     ];

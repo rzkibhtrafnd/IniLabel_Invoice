@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('total_harga', 10, 2);
             $table->decimal('diskon', 10, 2);
             $table->decimal('ongkir', 10, 2);
+            $table->decimal('tax', 10, 2);
             $table->decimal('total_bayar', 10, 2);
             $table->enum('status', ['Draft', 'Dibayar sebagian', 'Lunas', 'Dibatalkan']);
             $table->timestamps();

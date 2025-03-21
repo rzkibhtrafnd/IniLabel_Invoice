@@ -6,7 +6,7 @@ import { CiSquarePlus } from "react-icons/ci";
 import { IoIosArrowBack } from "react-icons/io";
 import formatToRupiah from "../../utils/formatToRupiah";
 
-export default function Invoice({ products = [], customers = [] }) {
+export default function CreateInvoice({ products = [], customers = [], taxPercentage = 0 }) {
   const containerRef = useRef(null);
   const [isMedium, setIsMedium] = useState(true);
   const [rows, setRows] = useState([{ produk_id: "", kuantitas: 1, total: 0 }]);
@@ -17,7 +17,6 @@ export default function Invoice({ products = [], customers = [] }) {
     items: [],
     diskon: 0,
     ongkir: 0,
-    tax: 0,
   });
 
   const productPrices = products.reduce((acc, product) => {
@@ -44,22 +43,30 @@ export default function Invoice({ products = [], customers = [] }) {
       }
     }
     setRows(newRows);
-    setData('items', rows);
+    setData('items', newRows);
   };
 
   const removeRow = (index) => {
-    const newRows = [...rows.slice(0, index), ...rows.slice(index + 1)];
+    const newRows = rows.filter((_, i) => i !== index);
     setRows(newRows);
     setData('items', newRows);
   };
-  
 
+  // Hitung subtotal dan pajak
   const subtotal = rows.reduce((sum, row) => sum + row.total, 0);
-  const total = subtotal - data.diskon + data.ongkir + data.tax;
+  const diskon = parseFloat(data.diskon) || 0;
+  const ongkir = parseFloat(data.ongkir) || 0;
+  const baseForTax = subtotal - diskon + ongkir;
+  const computedTax = Math.round(baseForTax * (taxPercentage / 100) * 100) / 100;
+  const total = baseForTax + computedTax;
 
   const handleCreateTransaction = (e) => {
     e.preventDefault();
-    post("/invoices", data);
+    post("/invoices", {
+      ...data,
+      // Meskipun tax dihitung di sisi server, kita bisa mengirimkan nilai hitungannya untuk tampilan
+      tax: computedTax,
+    });
   };
 
   useEffect(() => {
@@ -80,12 +87,8 @@ export default function Invoice({ products = [], customers = [] }) {
       <Link href="/invoices" className="inline-flex items-center text-blue-500 hover:underline">
         <IoIosArrowBack size={24} className="mr-2" /> Kembali
       </Link>
-      <div
-        ref={containerRef}
-        className={`grid gap-6 ${
-          isMedium ? "grid-cols-1" : "grid-cols-[6fr_4fr] auto-rows-auto"
-        }`}
-      >
+      <form onSubmit={handleCreateTransaction} ref={containerRef} className={`grid gap-6 ${isMedium ? "grid-cols-1" : "grid-cols-[6fr_4fr] auto-rows-auto"}`}>
+        {/* Form Input */}
         <div className={`flex flex-col gap-4 ${isMedium ? "order-1" : ""}`}>
           <h2 className="text-2xl font-bold">Tambah Invoice</h2>
           <div className="flex flex-col gap-2">
@@ -127,36 +130,32 @@ export default function Invoice({ products = [], customers = [] }) {
             </div>
           </div>
         </div>
+
+        {/* Ringkasan Pembayaran */}
         <div className={`bg-[#F6F6F6] flex flex-col gap-4 p-6 rounded-xl ${isMedium ? "order-3" : ""}`}>
           <div>
             <label className="block text-sm text-[#646262] font-semibold">Diskon</label>
             <input
-              type="text"
-              inputMode="numeric"
-              value={data.diskon === 0 ? "" : data.diskon} 
-              onChange={(e) => setData('diskon', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              type="number"
+              value={data.diskon || ""}
+              onChange={(e) => setData('diskon', parseFloat(e.target.value) || 0)}
               className="w-full p-2 border rounded-[10px] mt-1"
             />
           </div>
           <div>
             <label className="block text-sm text-[#646262] font-semibold">Ongkir</label>
             <input
-              type="text"
-              inputMode="numeric"
-              value={data.ongkir === 0 ? "" : data.ongkir}
-              onChange={(e) => setData('ongkir', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              type="number"
+              value={data.ongkir || ""}
+              onChange={(e) => setData('ongkir', parseFloat(e.target.value) || 0)}
               className="w-full p-2 border rounded-[10px] mt-1"
             />
           </div>
           <div>
-            <label className="block text-sm text-[#646262] font-semibold">Pajak</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={data.tax === 0 ? "" : data.tax}
-              onChange={(e) => setData('tax', e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
-              className="w-full p-2 border rounded-[10px] mt-1"
-            />
+            <label className="block text-sm text-[#646262] font-semibold">Pajak ({taxPercentage}%)</label>
+            <div className="w-full p-2 border rounded-[10px] mt-1 bg-gray-100">
+              {formatToRupiah(computedTax)}
+            </div>
           </div>
           <div className="mt-10 flex flex-col gap-4">
             <p className="font-bold text-[#111] flex text-xl justify-between">
@@ -164,17 +163,20 @@ export default function Invoice({ products = [], customers = [] }) {
               <span>{formatToRupiah(total)}</span>
             </p>
             <button
-              onClick={handleCreateTransaction}
+              type="submit"
+              disabled={processing}
               className="bg-[#01669E] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center"
             >
               Buat Transaksi
             </button>
           </div>
         </div>
+
+        {/* Tabel Item */}
         <div className={`flex flex-col gap-2 ${isMedium ? "order-2" : "col-span-2"}`}>
           <h2 className="text-2xl font-bold">Order Detail</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full overflow-hidden">
+            <table className="min-w-full">
               <thead>
                 <tr>
                   <th className="p-1 text-sm text-[#646262] text-start">Items</th>
@@ -189,8 +191,8 @@ export default function Invoice({ products = [], customers = [] }) {
                   <tr key={index}>
                     <td className="p-1 min-w-[200px]">
                       <select
-                        className="min-w-[200px] w-full border-2 bg-[#FCFDFD] border-[#D5D5D5] cursor-pointer rounded-[7px] p-2"
-                        value={row.name}
+                        className="w-full p-2 border rounded-[7px] cursor-pointer"
+                        value={row.produk_id}
                         onChange={(e) => updateRow(index, "id", e.target.value)}
                       >
                         <option value="">Pilih Item</option>
@@ -201,36 +203,37 @@ export default function Invoice({ products = [], customers = [] }) {
                     </td>
                     <td className="p-2 w-[60px]">
                       <input
-                        type="text"
-                        inputMode="number"
+                        type="number"
                         value={row.kuantitas}
-                        className="w-[60px] p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]"
+                        className="w-[60px] p-2 border rounded-[7px]"
                         onChange={(e) => updateRow(index, "kuantitas", e.target.value)}
                       />
                     </td>
                     <td className="p-2 w-[110px] text-center">
-                      <div className="p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]">
+                      <div className="p-2 border rounded-[7px] bg-gray-100">
                         {productPrices[row.produk_id] ? formatToRupiah(productPrices[row.produk_id]) : "-"}
                       </div>
                     </td>
                     <td className="p-2 w-[110px] text-center">
-                      <div className="p-2 border-2 bg-[#FCFDFD] border-[#D5D5D5] rounded-[7px]">
+                      <div className="p-2 border rounded-[7px] bg-gray-100">
                         {formatToRupiah(row.total)}
                       </div>
                     </td>
                     <td className="p-2 text-center">
-                      <button onClick={() => removeRow(index)} className="text-red-500 cursor-pointer"><MdOutlineCancel size={24}/></button>
+                      <button onClick={() => removeRow(index)} className="text-red-500">
+                        <MdOutlineCancel size={24}/>
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <button onClick={addItem} className="p-1 items-center gap-2 flex w-fit text-[#4D4FED] font-bold underline cursor-pointer">
+          <button onClick={addItem} className="flex items-center gap-2 w-fit text-[#4D4FED] font-bold underline">
             <CiSquarePlus size={24} /> Tambah Item
           </button>
         </div>
-      </div>
+      </form>
     </DashboardLayout>
   );
 }
