@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Receipts;
 use App\Models\Invoice;
-use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -45,12 +44,12 @@ class ReceiptController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice_id'         => 'required|exists:invoices,id',
-            'metode_pembayaran'  => 'required|in:Tunai,Transfer,Virtual Account',
-            'status'             => 'required|in:Dibayar Sebagian,Lunas',
-            'jumlah_bayar'       => 'required|numeric|min:0',
-            'tanggal_bayar'      => 'required|date',
-            'bukti_pembayaran'   => 'required|image',
+            'invoice_id'        => 'required|exists:invoices,id',
+            'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
+            'status'            => 'required|in:Dibayar Sebagian,Lunas',
+            'jumlah_bayar'      => 'required|numeric|min:0',
+            'tanggal_bayar'     => 'required|date',
+            'bukti_pembayaran'  => 'required|image',
         ]);
 
         $data = $request->only([
@@ -69,16 +68,24 @@ class ReceiptController extends Controller
 
         $receipt = Receipts::create($data);
 
-        return redirect()->route('receipts.show', $receipt->id);
+        return redirect()
+            ->route('receipts.show', $receipt->id)
+            ->with('success', 'Receipt berhasil dibuat!');
     }
 
-    /**
+    /**S
      * Display the specified receipt.
      */
     public function show(Receipts $receipt)
     {
+        $receipt->load(['invoice', 'user']);
+    
+        if ($receipt->bukti_pembayaran) {
+            $receipt->bukti_pembayaran = Storage::url('bukti_pembayaran/' . $receipt->bukti_pembayaran);
+        }
+    
         return Inertia::render('Receipts/Show', [
-            'receipt' => $receipt->load(['invoice', 'user']),
+            'receipt' => $receipt,
         ]);
     }
 
@@ -101,12 +108,12 @@ class ReceiptController extends Controller
     public function update(Request $request, Receipts $receipt)
     {
         $request->validate([
-            'invoice_id'         => 'required|exists:invoices,id',
-            'metode_pembayaran'  => 'required|in:Tunai,Transfer,Virtual Account',
-            'status'             => 'required|in:Dibayar Sebagian,Lunas',
-            'jumlah_bayar'       => 'required|numeric|min:0',
-            'tanggal_bayar'      => 'required|date',
-            'bukti_pembayaran'   => 'nullable|image',
+            'invoice_id'        => 'required|exists:invoices,id',
+            'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
+            'status'            => 'required|in:Dibayar Sebagian,Lunas',
+            'jumlah_bayar'      => 'required|numeric|min:0',
+            'tanggal_bayar'     => 'required|date',
+            'bukti_pembayaran'  => 'nullable|image',
         ]);
 
         $data = $request->only([
@@ -118,7 +125,6 @@ class ReceiptController extends Controller
         ]);
 
         if ($request->hasFile('bukti_pembayaran')) {
-            // Hapus file lama jika ada
             if ($receipt->bukti_pembayaran) {
                 Storage::delete($receipt->bukti_pembayaran);
             }
@@ -127,7 +133,9 @@ class ReceiptController extends Controller
 
         $receipt->update($data);
 
-        return redirect()->route('receipts.show', $receipt->id);
+        return redirect()
+            ->route('receipts.show', $receipt->id)
+            ->with('success', 'Receipt berhasil diperbarui!');
     }
 
     /**
@@ -141,13 +149,15 @@ class ReceiptController extends Controller
 
         $receipt->delete();
 
-        return redirect()->route('receipts.index');
+        return redirect()
+            ->route('receipts.index')
+            ->with('success', 'Receipt berhasil dihapus!');
     }
 
     /**
-     * Download the invoice as a PDF.
+     * Download the receipt as a PDF.
      */
-    public function downloadReceipt(Receipt $receipt)
+    public function downloadReceipt(Receipts $receipt)
     {
         $receipt->load(['invoice', 'user']);
         $imagePath = public_path('assets/logo.png');
@@ -159,7 +169,13 @@ class ReceiptController extends Controller
         }
 
         $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc'))
-            ->setPaper('A4', 'portrait');
+            ->setPaper('A4', 'portrait')
+            ->setOptions([
+                'margin-left'   => 0,
+                'margin-right'  => 0,
+                'margin-top'    => 0,
+                'margin-bottom' => 0,
+            ]);
 
         return $pdf->download("Receipt_{$receipt->id}.pdf");
     }
