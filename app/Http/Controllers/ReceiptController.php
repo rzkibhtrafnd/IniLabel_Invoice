@@ -9,6 +9,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\ReceiptEmail;
+use Illuminate\Support\Facades\Mail;
+use App\Models\Setting;
 
 class ReceiptController extends Controller
 {
@@ -159,16 +162,18 @@ class ReceiptController extends Controller
      */
     public function downloadReceipt(Receipts $receipt)
     {
-        $receipt->load(['invoice', 'user']);
+        $receipt->load(['invoice.customer', 'user']);
+        $setting = Setting::first();
+    
+        // Gambar logo
         $imagePath = public_path('assets/logo.png');
+        $imageSrc  = null;
         if (file_exists($imagePath)) {
             $imageData = base64_encode(file_get_contents($imagePath));
-            $imageSrc = 'data:image/png;base64,' . $imageData;
-        } else {
-            $imageSrc = null;
+            $imageSrc  = 'data:image/png;base64,' . $imageData;
         }
-
-        $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc'))
+    
+        $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc', 'setting'))
             ->setPaper('A4', 'portrait')
             ->setOptions([
                 'margin-left'   => 0,
@@ -176,7 +181,46 @@ class ReceiptController extends Controller
                 'margin-top'    => 0,
                 'margin-bottom' => 0,
             ]);
-
+    
         return $pdf->download("Receipt_{$receipt->id}.pdf");
     }
+    
+
+    /**
+     * Send the receipt via email.
+     */
+    public function sendEmail(Receipts $receipt)
+{
+    $receipt->load(['invoice.customer', 'user']);
+    $setting = Setting::first();
+
+    // Gambar logo (jika diperlukan di PDF)
+    $imagePath = public_path('assets/logo.png');
+    $imageSrc  = null;
+    if (file_exists($imagePath)) {
+        $imageData = base64_encode(file_get_contents($imagePath));
+        $imageSrc  = 'data:image/png;base64,' . $imageData;
+    }
+
+    // Buat PDF
+    $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc', 'setting'))
+        ->setPaper('A4', 'portrait')
+        ->setOptions([
+            'margin-left'   => 0,
+            'margin-right'  => 0,
+            'margin-top'    => 0,
+            'margin-bottom' => 0,
+        ]);
+
+    // Hasil PDF dalam bentuk string
+    $pdfContent = $pdf->output();
+
+    // Email customer
+    $customerEmail = $receipt->invoice->customer->email ?? 'default@example.com';
+
+    // Kirim email
+    Mail::to($customerEmail)->send(new ReceiptEmail($receipt, $pdfContent));
+
+    return redirect()->back()->with('success', 'Receipt telah dikirim ke ' . $customerEmail);
+}
 }

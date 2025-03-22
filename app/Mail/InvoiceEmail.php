@@ -37,13 +37,29 @@ class InvoiceEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Invoice #' . $this->invoice->id)
-                    ->view('emails.invoice')
-                    ->attachData($this->pdfContent, "Invoice_{$this->invoice->id}.pdf", [
-                        'mime' => 'application/pdf',
-                    ])
-                    ->with([
-                        'setting' => $this->setting,
-                    ]);
+        // Mulai dengan attach PDF
+        $mail = $this->subject('Invoice #' . $this->invoice->id)
+                     ->view('emails.invoice')
+                     ->attachData($this->pdfContent, "Invoice_{$this->invoice->id}.pdf", [
+                         'mime' => 'application/pdf',
+                     ])
+                     ->with([
+                         'setting' => $this->setting,
+                         'invoice' => $this->invoice,
+                     ]);
+
+        // Jika ada QRIS di Setting, attach file-nya
+        if (!empty($this->setting->qris)) {
+            $mail->attachFromStorageDisk(
+                'public',
+                $this->setting->qris,
+                'qris.png',
+                [
+                    'mime' => 'image/png',
+                ]
+            );
+        }
+
+        return $mail;
     }
 }

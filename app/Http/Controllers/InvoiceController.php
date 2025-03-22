@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\InvoiceEmail;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceController extends Controller
 {
@@ -192,30 +193,32 @@ class InvoiceController extends Controller
 
     public function sendEmail(Invoice $invoice)
     {
-        // Muat relasi customer, details.product, user dan pengaturan
+        // Muat relasi dan setting
         $invoice->load(['customer', 'details.product', 'user']);
         $setting = Setting::first();
-
+    
         // Gambar logo
         $imagePath = public_path('assets/logo.png');
         $imageData = base64_encode(file_get_contents($imagePath));
         $imageSrc  = 'data:image/png;base64,' . $imageData;
-
-        // Sertakan data setting (misal: QRIS) pada PDF
+    
+        // Generate PDF
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'imageSrc', 'setting'))
-                ->setPaper('A4', 'portrait')
-                ->setOptions([
-                    'margin-left'   => 0,
-                    'margin-right'  => 0,
-                    'margin-top'    => 0,
-                    'margin-bottom' => 0,
-                ]);
-
+            ->setPaper('A4', 'portrait')
+            ->setOptions([
+                'margin-left'   => 0,
+                'margin-right'  => 0,
+                'margin-top'    => 0,
+                'margin-bottom' => 0,
+            ]);
+    
         $pdfContent = $pdf->output();
-
-        // Kirim email dengan lampiran PDF dan sertakan juga QRIS dari pengaturan
-        \Mail::to($invoice->customer->email)->send(new InvoiceEmail($invoice, $pdfContent, $setting));
-
+    
+        // Kirim email dengan lampiran PDF dan Setting
+        Mail::to($invoice->customer->email)->send(
+            new InvoiceEmail($invoice, $pdfContent, $setting)
+        );
+    
         return redirect()->back()->with('success', 'Email invoice telah dikirim ke ' . $invoice->customer->email);
     }
 }

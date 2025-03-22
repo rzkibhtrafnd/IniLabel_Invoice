@@ -68,10 +68,10 @@
                     <tr>
                         <td>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="5" border="0" style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                                <tr><td><strong>Nomor Invoice:</strong></td><td>INV-{{ $invoice->id }}</td></tr>
+                                <tr><td><strong>Nomor Invoice:</strong></td><td>INV-00{{ $invoice->id }}</td></tr>
                                 <tr><td><strong>Tanggal:</strong></td><td>{{ \Carbon\Carbon::parse($invoice->created_at)->format('d F Y') }}</td></tr>
-                                <tr><td><strong>Jumlah Tagihan:</strong></td><td><strong style="color: #007bff;">Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</strong></td></tr>
                                 <tr><td><strong>Jatuh Tempo:</strong></td><td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d F Y') }}</td></tr>
+                                <tr><td><strong>Jumlah Tagihan:</strong></td><td><strong style="color: #007bff;">Rp {{ number_format($invoice->total_bayar, 0, ',', '.') }}</strong></td></tr>
                             </table>
                         </td>
                     </tr>

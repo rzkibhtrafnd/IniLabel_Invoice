@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadInvoice'])->name('invoices.download');
     Route::get('/invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.sendEmail');
     Route::resource('receipts', ReceiptController::class);
-    Route::resource('settings', SettingController::class);
     Route::get('/receipts/{receipt}/download', [ReceiptController::class, 'downloadReceipt'])->name('receipts.download');
+    Route::get('receipts/{receipt}/send-email', [ReceiptController::class, 'sendEmail'])->name('receipts.sendEmail');
+    Route::resource('settings', SettingController::class);
 });
