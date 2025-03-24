@@ -29,7 +29,7 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return Redirect::route('products.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('products.index')->with('message', 'Success.Data Berhasil Disimpan!');
     }
 
     public function update(Request $request, Product $product)
@@ -43,7 +43,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return Redirect::route('products.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('products.index')->with('message', 'Success.Data Berhasil Disimpan!');
     }
 
     public function destroy(Product $product)

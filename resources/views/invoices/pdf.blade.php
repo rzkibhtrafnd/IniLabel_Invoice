@@ -29,7 +29,7 @@
     <table class="table-header">
       <tr>
         <td>
-          <h2>{{$setting->company_name}}</h2>
+          <h2>PT. {{$setting->company_name}}</h2>
           <table>
             <tr>
               <th>No Invoice</th>
@@ -50,7 +50,7 @@
           </table>
         </td>
         <td>
-          <h2>INVOICE PEMESANAN</h2>
+          <h2>Data Customer</h2>
           <table>
             <tr>
               <th>Nama Customer</th>
@@ -89,8 +89,8 @@
           <tr>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: start; padding: 10px; width: 100%;">{{ $item->product->name }}</td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ $item->kuantitas }}</td>
-            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ $item->harga }}</td>
-            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ $item->total_harga }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ number_format($item->harga, 0, ',', '.') }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ number_format($item->total_harga, 0, ',', '.') }}</td>
           </tr>
         @endforeach
       </tbody>
@@ -99,28 +99,32 @@
     <table class="table-summary">
       <tr>
         <td style="width: 65%;"></td>
-        <td style="width: 35%;">
+        <td style="width: 50%;">
           <div>
             <table>
               <tr>
                 <th style="text-align: left;">Sub Total:</th>
-                <td style="text-align: right;">Rp {{$invoice->total_harga}}</td>
+                <td style="text-align: right;">Rp {{number_format($invoice->total_harga, 0, ',', '.')}}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Diskon/Promo:</th>
-                <td style="text-align: right;">Rp {{$invoice->diskon}}</td>
+                <td style="text-align: right;">Rp {{number_format($invoice->diskon, 0, ',', '.')}}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Ongkos Kirim:</th>
-                <td style="text-align: right;">Rp {{$invoice->ongkir}}</td>
+                <td style="text-align: right;">Rp {{number_format($invoice->ongkir, 0, ',', '.')}}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Pajak/Tax:</th>
-                <td style="text-align: right;">Rp {{$invoice->tax}}</td>
+                <td style="text-align: right;">Rp {{number_format($invoice->tax, 0, ',', '.')}}</td>
               </tr>
               <tr>
-                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total Bayar:</th>
-                <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">Rp {{$invoice->total_bayar}}</td>
+                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total Tagihan:</th>
+                <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">Rp {{number_format($invoice->total_bayar, 0, ',', '.')}}</td>
+              </tr>
+              <tr>
+                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total Terbayar:</th>
+                <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">Rp {{number_format($invoice->total_dibayar, 0, ',', '.')}}</td>
               </tr>
             </table>
           </div>
@@ -136,7 +140,6 @@
         <td>
           <p>Lakukan Pembayaran Sebelum Batas Akhir Yang Telah ditentukan</p>
           @php
-            // Jika $setting->banks sudah berupa array, gunakan langsung; jika tidak, decode
             $banks = is_array($setting->banks) ? $setting->banks : json_decode($setting->banks, true);
           @endphp
           @if($banks)

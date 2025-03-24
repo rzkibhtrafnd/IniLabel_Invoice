@@ -1,6 +1,7 @@
 import DashboardLayout from "../../Layouts/DashboardLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { IoIosArrowBack } from "react-icons/io";
+import formatToRupiah from "../../utils/formatToRupiah";
 
 export default function CreateReceipt({ invoices = [] }) {
   const { data, setData, post, processing, errors } = useForm({
@@ -42,7 +43,7 @@ export default function CreateReceipt({ invoices = [] }) {
               <option value="">Pilih Invoice</option>
               {invoices.map((invoice) => (
                 <option key={invoice.id} value={invoice.id}>
-                  {invoice.id} - {invoice.total_bayar}
+                  {invoice.id} - {formatToRupiah(invoice.total_bayar)}
                 </option>
               ))}
             </select>

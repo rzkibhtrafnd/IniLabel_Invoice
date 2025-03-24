@@ -31,7 +31,7 @@
     <table class="table-header">
       <tr>
         <td>
-          <h2>{{ $setting->company_name ?? 'Company Name' }}</h2>
+          <h2>PT {{ $setting->company_name ?? 'Company Name' }}</h2>
           <table>
             <tr>
               <th>No Receipt</th>
@@ -52,7 +52,7 @@
           </table>
         </td>
         <td>
-          <h2>STRUK PEMBAYARAN</h2>
+          <h2>Data Customer</h2>
           <table>
             <tr>
               <th>Nama Customer</th>
@@ -88,16 +88,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td style="border-bottom: 1px solid #DFE4EA; text-align: center; padding: 10px;">{{ $receipt->metode_pembayaran }}</td>
-          <td style="border-bottom: 1px solid #DFE4EA; text-align: center; padding: 10px;">{{ $receipt->status }}</td>
-          <td style="border-bottom: 1px solid #DFE4EA; text-align: center; padding: 10px;">Rp {{ number_format($receipt->jumlah_bayar, 0, ',', '.') }}</td>
-          <td style="border-bottom: 1px solid #DFE4EA; text-align: center; padding: 10px;">{{ date('d M Y', strtotime($receipt->tanggal_bayar)) }}</td>
-        </tr>
+        @foreach($receipt->invoice->receipts as $receiptItem)
+          <tr>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px;">{{ $receiptItem->metode_pembayaran }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px;">{{ $receiptItem->status }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px;">Rp {{ number_format($receiptItem->jumlah_bayar, 0, ',', '.') }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px;">{{ date('d M Y', strtotime($receiptItem->tanggal_bayar)) }}</td>
+          </tr>
+        @endforeach
       </tbody>
     </table>
 
-    <!-- KODE TAMBAHAN UNTUK ITEM INVOICE -->
     <br>
     <table style="border-collapse: collapse; border: 1px solid #DFE4EA; width: 100%;">
       <thead>
@@ -118,17 +119,16 @@
               {{ $item->kuantitas }}
             </td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">
-              {{ $item->harga }}
+              {{ number_format($item->harga, 0, ',', '.') }}
             </td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">
-              {{ $item->total_harga }}
+              {{ number_format($item->total_harga, 0, ',', '.') }}
             </td>
           </tr>
         @endforeach
       </tbody>
     </table>
 
-    <!-- RINGKASAN (SUBTOTAL, DISKON, DST) DARI INVOICE -->
     <table class="table-summary">
       <tr>
         <td style="width: 65%;"></td>
@@ -137,24 +137,24 @@
             <table>
               <tr>
                 <th style="text-align: left;">Sub Total:</th>
-                <td style="text-align: right;">Rp {{ $receipt->invoice->total_harga }}</td>
+                <td style="text-align: right;">Rp {{ number_format($receipt->invoice->total_harga, 0, ',', '.') }}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Diskon/Promo:</th>
-                <td style="text-align: right;">Rp {{ $receipt->invoice->diskon }}</td>
+                <td style="text-align: right;">Rp {{ number_format($receipt->invoice->diskon, 0, ',', '.') }}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Ongkos Kirim:</th>
-                <td style="text-align: right;">Rp {{ $receipt->invoice->ongkir }}</td>
+                <td style="text-align: right;">Rp {{ number_format($receipt->invoice->ongkir, 0, ',', '.') }}</td>
               </tr>
               <tr>
                 <th style="text-align: left;">Pajak/Tax:</th>
-                <td style="text-align: right;">Rp {{ $receipt->invoice->tax }}</td>
+                <td style="text-align: right;">Rp {{ number_format($receipt->invoice->tax, 0, ',', '.') }}</td>
               </tr>
               <tr>
-                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total Bayar:</th>
+                <th style="text-align: left; font-size: 16px; padding-top: 21px;">Total:</th>
                 <td style="text-align: right; font-size: 16px; font-weight: bold; padding-top: 21px;">
-                  Rp {{ $receipt->invoice->total_bayar }}
+                  Rp {{ number_format($receipt->invoice->total_bayar, 0, ',', '.') }}
                 </td>
               </tr>
             </table>
@@ -169,10 +169,12 @@
     <table>
       <tr>
         <td>
+          <ol>
             <li>Receipt ini adalah bukti pembayaran, bukan invoice atau tagihan.</li>
             <li>Komplain hanya diterima dalam 2x24 jam setelah barang diterima.</li>
             <li>Kesalahan input data pemesan bukan tanggung jawab IniLabel.</li>
             <li>Pembayaran tidak dapat dibatalkan atau direfund, kecuali kesalahan produksi.</li>
+          </ol>
         </td>
         <td>
           <p>{{ $setting->company_name }} – {{ $setting->slogan }}</p>

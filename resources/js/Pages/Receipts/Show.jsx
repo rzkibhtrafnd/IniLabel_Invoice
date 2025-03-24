@@ -8,7 +8,6 @@ export default function ShowReceipt({ receipt }) {
   const containerRef = useRef(null);
   const [isMedium, setIsMedium] = useState(true);
 
-  // Jika Receipt memuat relasi invoice beserta detailnya, gunakan:
   const invoice = receipt.invoice || {};
   const details = invoice.details || [];
 
@@ -23,6 +22,24 @@ export default function ShowReceipt({ receipt }) {
 
     return () => observer.disconnect();
   }, []);
+
+  const handleSendWA = () => {
+    const message = `Halo,\n\nBerikut detail pembayaran Anda:\n
+  ➤ Invoice ID: ${receipt.invoice_id}
+  ➤ Metode Pembayaran: ${receipt.metode_pembayaran}
+  ➤ Status: ${receipt.status || "-"}
+  ➤ Tanggal Bayar: ${receipt.tanggal_bayar}
+  ➤ Jumlah Bayar: ${formatToRupiah(receipt.jumlah_bayar)}
+  
+  Silakan simpan bukti pembayaran Anda. Jika ada pertanyaan, hubungi kami.
+  
+  Terima kasih.`;
+  
+    navigator.clipboard.writeText(message).then(() => {
+      alert("Pesan WA telah disalin ke clipboard. Silakan tempel ke WhatsApp.");
+    }).catch(err => console.error("Gagal menyalin teks:", err));
+  };
+  
 
   return (
     <DashboardLayout className="bg-white">
@@ -58,9 +75,9 @@ export default function ShowReceipt({ receipt }) {
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-600">Status</label>
-            <div className="border border-gray-300 px-3 py-2 rounded-[10px]">
-              {receipt.status}
-            </div>
+              <div className="border border-gray-300 px-3 py-2 rounded-[10px]">
+                {receipt.status || "-"}
+              </div>
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-gray-600">
@@ -72,16 +89,16 @@ export default function ShowReceipt({ receipt }) {
           </div>
           {receipt.bukti_pembayaran && (
             <div className="flex flex-col gap-2">
-                <label className="font-semibold text-gray-600">
+              <label className="font-semibold text-gray-600">
                 Bukti Pembayaran
-                </label>
-                <img
+              </label>
+              <img
                 src={receipt.bukti_pembayaran}
                 alt="Bukti Pembayaran"
                 className="border border-gray-300 rounded-[10px] max-w-full"
-                />
+              />
             </div>
-            )}
+          )}
         </div>
 
         {/* Kolom Ringkasan & Tombol Aksi */}
@@ -111,12 +128,9 @@ export default function ShowReceipt({ receipt }) {
             >
               Send Email
             </a>
-            <a
-              href={`/receipts/${receipt.id}/send-wa`}
-              className="bg-[#25D366] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center"
-            >
-              Send WA
-            </a>
+            <button onClick={handleSendWA} className="bg-[#25D366] text-white p-2 shadow-[0px_4px_4px_rgba(0,0,0,0.25)] font-semibold cursor-pointer rounded-md text-center">
+              Kirim WA
+            </button>
           </div>
         </div>
 

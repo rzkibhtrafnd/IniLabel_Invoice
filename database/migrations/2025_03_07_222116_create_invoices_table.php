@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('ongkir', 10, 2);
             $table->decimal('tax', 10, 2);
             $table->decimal('total_bayar', 10, 2);
+            $table->decimal('total_dibayar', 15, 2)->default(0);
             $table->enum('status', ['Draft', 'Dibayar sebagian', 'Lunas', 'Dibatalkan']);
             $table->timestamps();
         });

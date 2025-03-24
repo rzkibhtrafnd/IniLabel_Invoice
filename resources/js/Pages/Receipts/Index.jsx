@@ -10,6 +10,7 @@ import TableHeader from "../../Components/Tables/TableHeader";
 import TableData from "../../Components/Tables/TableData";
 import Pagination from "../../Components/Tables/Pagination";
 import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
+import formatToRupiah from "../../utils/formatToRupiah";
 
 export default function Receipts({ receipts }) {
   const { get, delete: destroy } = useForm();
@@ -51,7 +52,7 @@ export default function Receipts({ receipts }) {
                   <TableData>{receipt.invoice_id}</TableData>
                   <TableData>{receipt.metode_pembayaran}</TableData>
                   <TableData>{receipt.status}</TableData>
-                  <TableData>{receipt.jumlah_bayar}</TableData>
+                  <TableData>{formatToRupiah(receipt.jumlah_bayar)}</TableData>
                   <TableData className="px-1 w-[111px]">
                     <Button
                       onClick={() => onDetailReceipt(receipt.id)}

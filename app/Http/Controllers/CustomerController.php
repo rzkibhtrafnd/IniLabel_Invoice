@@ -29,7 +29,7 @@ class CustomerController extends Controller
 
         Customer::create($validated);
 
-        return Redirect::route('customers.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('customers.index')->with('message', 'Success.Data Berhasil Disimpan!');
     }
 
     public function update(Request $request, Customer $customer)
@@ -43,7 +43,7 @@ class CustomerController extends Controller
 
         $customer->update($validated);
 
-        return Redirect::route('customers.index')->with('message', 'Data Berhasil Disimpan!');
+        return Redirect::route('customers.index')->with('message', 'Success.Data Berhasil Disimpan!');
     }
 
     public function destroy(Customer $customer)

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Mail\ReceiptEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Setting;
+use App\Mail\ReceiptNotificationEmail;
 
 class ReceiptController extends Controller
 {
@@ -34,8 +35,7 @@ class ReceiptController extends Controller
      */
     public function create()
     {
-        $invoices = Invoice::all(['id', 'total_bayar']);
-
+        $invoices = Invoice::where('status', '!=', 'Dibatalkan')->get(['id', 'total_bayar']);
         return Inertia::render('Receipts/Create', [
             'invoices' => $invoices,
         ]);
@@ -49,44 +49,48 @@ class ReceiptController extends Controller
         $request->validate([
             'invoice_id'        => 'required|exists:invoices,id',
             'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
-            'status'            => 'required|in:Dibayar Sebagian,Lunas',
             'jumlah_bayar'      => 'required|numeric|min:0',
             'tanggal_bayar'     => 'required|date',
-            'bukti_pembayaran'  => 'required|image',
+            'bukti_pembayaran'  => $request->metode_pembayaran === 'Tunai' ? 'nullable' : 'required|image',
+            'status'            => 'required|in:Dibayar Sebagian,Lunas',
         ]);
-
+    
+        $invoice = Invoice::findOrFail($request->invoice_id);
+    
+        if ($invoice->status === 'Dibatalkan') {
+            return redirect()->back()->withErrors(['invoice_id' => 'Invoice telah dibatalkan!']);
+        }
+    
         $data = $request->only([
             'invoice_id',
             'metode_pembayaran',
-            'status',
             'jumlah_bayar',
-            'tanggal_bayar'
+            'tanggal_bayar',
+            'status',
         ]);
-
+    
         $data['user_id'] = Auth::id();
-
+    
         if ($request->hasFile('bukti_pembayaran')) {
             $data['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti_pembayaran');
         }
-
+    
         $receipt = Receipts::create($data);
-
-        return redirect()
-            ->route('receipts.show', $receipt->id)
-            ->with('success', 'Receipt berhasil dibuat!');
+    
+        // Update invoice
+        $invoice->total_dibayar += $receipt->jumlah_bayar;
+        $invoice->status = $this->hitungStatusInvoice($invoice);
+        $invoice->save();
+    
+        return redirect()->route('receipts.show', $receipt->id);
     }
 
-    /**S
+    /**
      * Display the specified receipt.
      */
     public function show(Receipts $receipt)
     {
         $receipt->load(['invoice', 'user']);
-    
-        if ($receipt->bukti_pembayaran) {
-            $receipt->bukti_pembayaran = Storage::url('bukti_pembayaran/' . $receipt->bukti_pembayaran);
-        }
-    
         return Inertia::render('Receipts/Show', [
             'receipt' => $receipt,
         ]);
@@ -97,8 +101,7 @@ class ReceiptController extends Controller
      */
     public function edit(Receipts $receipt)
     {
-        $invoices = Invoice::all(['id', 'total_bayar']);
-
+        $invoices = Invoice::where('status', '!=', 'Dibatalkan')->get(['id', 'total_bayar']);
         return Inertia::render('Receipts/Edit', [
             'receipt'  => $receipt,
             'invoices' => $invoices,
@@ -113,32 +116,43 @@ class ReceiptController extends Controller
         $request->validate([
             'invoice_id'        => 'required|exists:invoices,id',
             'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
-            'status'            => 'required|in:Dibayar Sebagian,Lunas',
             'jumlah_bayar'      => 'required|numeric|min:0',
             'tanggal_bayar'     => 'required|date',
-            'bukti_pembayaran'  => 'nullable|image',
+            'bukti_pembayaran'  => $request->metode_pembayaran === 'Tunai' ? 'nullable' : 'nullable|image',
+            'status'            => 'required|in:Dibayar Sebagian,Lunas',
         ]);
-
+    
+        $invoice = $receipt->invoice;
+    
+        if ($invoice->status === 'Dibatalkan') {
+            return redirect()->back()->withErrors(['message' => 'Invoice telah dibatalkan!']);
+        }
+    
+        $jumlahSebelumnya = $receipt->jumlah_bayar;
+    
         $data = $request->only([
             'invoice_id',
             'metode_pembayaran',
-            'status',
             'jumlah_bayar',
-            'tanggal_bayar'
+            'tanggal_bayar',
+            'status',
         ]);
-
+    
         if ($request->hasFile('bukti_pembayaran')) {
             if ($receipt->bukti_pembayaran) {
                 Storage::delete($receipt->bukti_pembayaran);
             }
             $data['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti_pembayaran');
         }
-
+    
         $receipt->update($data);
-
-        return redirect()
-            ->route('receipts.show', $receipt->id)
-            ->with('success', 'Receipt berhasil diperbarui!');
+    
+        // Update invoice
+        $invoice->total_dibayar += ($receipt->jumlah_bayar - $jumlahSebelumnya);
+        $invoice->status = $this->hitungStatusInvoice($invoice);
+        $invoice->save();
+    
+        return redirect()->route('receipts.show', $receipt->id);
     }
 
     /**
@@ -146,15 +160,38 @@ class ReceiptController extends Controller
      */
     public function destroy(Receipts $receipt)
     {
+        $invoice = $receipt->invoice;
+
+        if ($invoice->status === 'Dibatalkan') {
+            return redirect()->back()->withErrors(['message' => 'Invoice telah dibatalkan!']);
+        }
+
+        // Update invoice
+        $invoice->total_dibayar -= $receipt->jumlah_bayar;
+        $invoice->status = $this->hitungStatusInvoice($invoice);
+        $invoice->save();
+
+        // Hapus receipt
         if ($receipt->bukti_pembayaran) {
             Storage::delete($receipt->bukti_pembayaran);
         }
-
         $receipt->delete();
 
-        return redirect()
-            ->route('receipts.index')
-            ->with('success', 'Receipt berhasil dihapus!');
+        return redirect()->route('receipts.index');
+    }
+
+    /**
+     * Calculate the status of the invoice.
+     */
+    private function hitungStatusInvoice(Invoice $invoice)
+    {
+        if ($invoice->total_dibayar <= 0) {
+            return 'Draft';
+        } elseif ($invoice->total_dibayar < $invoice->total_bayar) {
+            return 'Dibayar sebagian';
+        } else {
+            return 'Lunas';
+        }
     }
 
     /**
@@ -164,15 +201,10 @@ class ReceiptController extends Controller
     {
         $receipt->load(['invoice.customer', 'user']);
         $setting = Setting::first();
-    
-        // Gambar logo
+
         $imagePath = public_path('assets/logo.png');
-        $imageSrc  = null;
-        if (file_exists($imagePath)) {
-            $imageData = base64_encode(file_get_contents($imagePath));
-            $imageSrc  = 'data:image/png;base64,' . $imageData;
-        }
-    
+        $imageSrc  = file_exists($imagePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath)) : null;
+
         $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc', 'setting'))
             ->setPaper('A4', 'portrait')
             ->setOptions([
@@ -181,46 +213,38 @@ class ReceiptController extends Controller
                 'margin-top'    => 0,
                 'margin-bottom' => 0,
             ]);
-    
+
         return $pdf->download("Receipt_{$receipt->id}.pdf");
     }
-    
 
     /**
      * Send the receipt via email.
      */
     public function sendEmail(Receipts $receipt)
-{
-    $receipt->load(['invoice.customer', 'user']);
-    $setting = Setting::first();
+    {
+        $receipt->load(['invoice.customer', 'user']);
+        $setting = Setting::first();
 
-    // Gambar logo (jika diperlukan di PDF)
-    $imagePath = public_path('assets/logo.png');
-    $imageSrc  = null;
-    if (file_exists($imagePath)) {
-        $imageData = base64_encode(file_get_contents($imagePath));
-        $imageSrc  = 'data:image/png;base64,' . $imageData;
+        $imagePath = public_path('assets/logo.png');
+        $imageSrc  = file_exists($imagePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath)) : null;
+
+        $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc', 'setting'))
+            ->setPaper('A4', 'portrait')
+            ->setOptions([
+                'margin-left'   => 0,
+                'margin-right'  => 0,
+                'margin-top'    => 0,
+                'margin-bottom' => 0,
+            ]);
+
+        $pdfContent = $pdf->output();
+
+        $customerEmail = $receipt->invoice->customer->email ?? 'default@example.com';
+        Mail::to($customerEmail)->send(new ReceiptEmail($receipt, $pdfContent));
+
+        $kasirEmail = $receipt->user->email;
+        Mail::to($kasirEmail)->send(new ReceiptNotificationEmail($receipt, $pdfContent, $setting));
+
+        return redirect()->back()->with('message', 'Succes.Receipt telah dikirim ke ' . $customerEmail);
     }
-
-    // Buat PDF
-    $pdf = Pdf::loadView('receipts.pdf', compact('receipt', 'imageSrc', 'setting'))
-        ->setPaper('A4', 'portrait')
-        ->setOptions([
-            'margin-left'   => 0,
-            'margin-right'  => 0,
-            'margin-top'    => 0,
-            'margin-bottom' => 0,
-        ]);
-
-    // Hasil PDF dalam bentuk string
-    $pdfContent = $pdf->output();
-
-    // Email customer
-    $customerEmail = $receipt->invoice->customer->email ?? 'default@example.com';
-
-    // Kirim email
-    Mail::to($customerEmail)->send(new ReceiptEmail($receipt, $pdfContent));
-
-    return redirect()->back()->with('success', 'Receipt telah dikirim ke ' . $customerEmail);
-}
 }

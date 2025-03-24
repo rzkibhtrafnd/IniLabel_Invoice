@@ -21,7 +21,7 @@ class InvoiceController extends Controller
         $invoices = Invoice::with(['customer', 'user'])
             ->latest()
             ->paginate(15);
-
+        
         return Inertia::render('Invoices/Index', [
             'invoices' => $invoices,
         ]);
@@ -29,7 +29,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer', 'details.product']);
+        $invoice->load(['customer', 'details.product', 'receipts']);
         return Inertia::render('Invoices/Show', [
             'invoice' => $invoice,
         ]);
@@ -50,7 +50,6 @@ class InvoiceController extends Controller
         $request->validate([
             'customer_id'       => 'required|exists:customers,id',
             'jatuh_tempo'       => 'required|date',
-            'status'            => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
             'items'             => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
@@ -81,7 +80,8 @@ class InvoiceController extends Controller
             'ongkir'      => $ongkir,
             'tax'         => $taxValue,
             'total_bayar' => $total_bayar,
-            'status'      => $request->status,
+            'total_dibayar' => 0,
+            'status'      => 'Draft',
         ]);
 
         foreach ($request->items as $item) {
@@ -94,7 +94,7 @@ class InvoiceController extends Controller
             ]);
         }
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice berhasil dibuat!');
+        return redirect()->route('invoices.index')->with('message', 'Success.Invoice berhasil dibuat!');
     }
 
     public function edit(Invoice $invoice)
@@ -113,7 +113,6 @@ class InvoiceController extends Controller
         $request->validate([
             'customer_id'       => 'required|exists:customers,id',
             'jatuh_tempo'       => 'required|date',
-            'status'            => 'required|in:Draft,Dibayar sebagian,Lunas,Dibatalkan',
             'items'             => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:products,id',
             'items.*.kuantitas' => 'required|integer|min:1',
@@ -145,7 +144,6 @@ class InvoiceController extends Controller
             'ongkir'      => $ongkir,
             'tax'         => $taxValue,
             'total_bayar' => $total_bayar,
-            'status'      => $request->status,
         ]);
 
         foreach ($request->items as $item) {
@@ -158,14 +156,14 @@ class InvoiceController extends Controller
             ]);
         }
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice berhasil diperbarui!');
+        return redirect()->route('invoices.index')->with('message', 'Success.Invoice berhasil diperbarui!');
     }
 
     public function destroy(Invoice $invoice)
     {
         $invoice->details()->delete();
         $invoice->delete();
-        return redirect()->route('invoices.index')->with('success', 'Invoice berhasil dihapus!');
+        return redirect()->route('invoices.index')->with('message', 'Invoice berhasil dihapus!');
     }
 
     public function downloadInvoice(Invoice $invoice)
@@ -204,21 +202,27 @@ class InvoiceController extends Controller
     
         // Generate PDF
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'imageSrc', 'setting'))
-            ->setPaper('A4', 'portrait')
-            ->setOptions([
-                'margin-left'   => 0,
-                'margin-right'  => 0,
-                'margin-top'    => 0,
-                'margin-bottom' => 0,
-            ]);
+                  ->setPaper('A4', 'portrait')
+                  ->setOptions([
+                      'margin-left'   => 0,
+                      'margin-right'  => 0,
+                      'margin-top'    => 0,
+                      'margin-bottom' => 0,
+                  ]);
     
         $pdfContent = $pdf->output();
     
-        // Kirim email dengan lampiran PDF dan Setting
+        // Kirim email ke customer dengan lampiran PDF
         Mail::to($invoice->customer->email)->send(
             new InvoiceEmail($invoice, $pdfContent, $setting)
         );
     
-        return redirect()->back()->with('success', 'Email invoice telah dikirim ke ' . $invoice->customer->email);
+        // Kirim notifikasi email ke user yang membuat invoice
+        Mail::to($invoice->user->email)->send(
+            new \App\Mail\InvoiceNotificationEmail($invoice, $pdfContent, $setting)
+        );
+    
+        return redirect()->back()->with('message', 'Success.Email invoice telah dikirim ke customer dan notifikasi telah dikirim ke user.');
     }
+    
 }

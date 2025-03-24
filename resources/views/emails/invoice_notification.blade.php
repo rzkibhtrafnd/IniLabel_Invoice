@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Invoice #{{ $invoice->id }}</title>
+    <title>Notifikasi Invoice</title>
     <style>
         body {
             margin: 0;
@@ -50,14 +50,14 @@
                 <table role="presentation" class="container" cellspacing="0" cellpadding="0" border="0">
                     <tr>
                         <td align="center">
-                            <img src="{{ asset('assets/logo.png') }}" alt="Inilabel Logo" width="120">
-                            <h2 style="color: #333; font-family: Arial, sans-serif; font-size: 24px;">Invoice #{{ $invoice->id }}</h2>
+                            <img src="{{ asset('assets/logo.png') }}" alt="Company Logo" width="120">
+                            <h2 style="color: #333; font-family: Arial, sans-serif; font-size: 24px;">Notifikasi Invoice</h2>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <p style="font-family: Arial, sans-serif; color: #555; font-size: 16px;">Halo <strong>{{ $invoice->customer->name }}</strong>,</p>
-                            <p style="font-family: Arial, sans-serif; color: #555; font-size: 16px;">Terima kasih telah bertransaksi dengan <strong>Inilabel</strong>. Berikut detail invoice Anda:</p>
+                            <p style="font-family: Arial, sans-serif; color: #555; font-size: 16px;">Halo <strong>{{ $invoice->user->username }}</strong>,</p>
+                            <p style="font-family: Arial, sans-serif; color: #555; font-size: 16px;">Invoice <strong>#{{ $invoice->id }}</strong> telah dikirim ke customer <strong>{{ $invoice->customer->name }}</strong>.</p>
                         </td>
                     </tr>
                     <tr>
@@ -76,15 +76,15 @@
                                     <td>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d F Y') }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Status Invoice</strong></td>
+                                    <td><strong>Status Invoice:</strong></td>
                                     <td>{{ $invoice->status }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Jumlah Tagihan:</strong></td>
+                                    <td><strong>Total Tagihan:</strong></td>
                                     <td><strong style="color: #007bff;">Rp {{ number_format($invoice->total_bayar, 0, ',', '.') }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Jumlah Terbayar:</strong></td>
+                                    <td><strong>Total Dibayar:</strong></td>
                                     <td><strong style="color: #007bff;">Rp {{ number_format($invoice->total_dibayar, 0, ',', '.') }}</strong></td>
                                 </tr>
                             </table>
@@ -94,21 +94,21 @@
                         <td>
                             <!-- Pesan pengganti tombol bayar -->
                             <div class="message-box">
-                                Silakan lakukan pembayaran melalui QRIS yang telah dikirim kepada Anda. Pastikan pembayaran dilakukan sebelum tanggal <strong>{{ \Carbon\Carbon::parse($invoice->due_date)->format('d F Y') }}</strong>.
+                                Silakan cek lampiran PDF untuk detail invoice.
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td align="center">
                             <p style="font-family: Arial, sans-serif; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                Setelah pembayaran, silakan konfirmasi ke:<br>
-                                📞 {{$invoice->user->notelepon}}
+                                Jika ada pertanyaan, silakan hubungi:<br>
+                                📞 {{ $invoice->user->notelepon }}
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td align="center" style="font-family: Arial, sans-serif; font-size: 14px; color: #888; padding-top: 10px; border-top: 1px solid #ddd;">
-                            <p>Salam, <br><strong>{{$setting->company_name}} Customer Support</strong></p>
+                            <p>Salam, <br><strong>{{ $setting->company_name ?? 'Perusahaan Anda' }} Customer Support</strong></p>
                         </td>
                     </tr>
                 </table>
