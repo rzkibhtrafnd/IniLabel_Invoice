@@ -3,13 +3,16 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
 
-export default function InvoiceChart() {
+export default function InvoiceChart({ chartData }) {
+  const labels = chartData.map((data) => data.date);
+  const totalInvoices = chartData.map((data) => data.total_invoices);
+
   const data = {
-    labels: Array.from({ length: 12 }, (_, i) => `${(i + 1) * 5}K`),
+    labels: Array.from({ length: chartData.length }, (_, i) => i),
     datasets: [
       {
-        label: "Invoice Percentage",
-        data: [20, 30, 25, 40, 35, 50, 55, 45, 60, 64, 48, 50],
+        label: "Total Invoices",
+        data: totalInvoices,
         borderColor: "#007bff",
         borderWidth: 2,
         pointRadius: 3,
@@ -31,19 +34,13 @@ export default function InvoiceChart() {
     responsive: true,
     scales: {
       y: {
-        min: 20,
-        max: 100,
         ticks: {
-          stepSize: 20,
           color: "#22272B66",
-          callback: (value) => `${value}%`,
-          padding: 25,
+          padding: 10,
         },
         grid: {
           drawTicks: false,
-          color: (context) => {
-            return context.tick.value % 20 === 0 ? "#EAEAEA" : "transparent";
-          },
+          color: "#EAEAEA",
         },
         border: {
           display: false,
@@ -51,8 +48,8 @@ export default function InvoiceChart() {
       },
       x: {
         ticks: {
-          padding: 25,
           color: "#22272B66",
+          padding: 10,
         },
         grid: {
           drawTicks: false,
@@ -64,16 +61,13 @@ export default function InvoiceChart() {
       },
     },
     plugins: {
-      filler: {
-        propagate: false,
-      },
       tooltip: {
         callbacks: {
-          label: (context) => `${context.raw}%`,
+          label: (context) => `Total Invoices: ${context.raw}`,
         },
       },
     },
   };
 
   return <Line data={data} options={options} />;
-};
+}

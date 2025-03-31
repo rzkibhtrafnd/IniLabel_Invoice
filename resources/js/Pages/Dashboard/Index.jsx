@@ -67,7 +67,7 @@ export default function Index({ overviewData, initialChartData }) {
     <DashboardLayout>
       <Head title="Dashboard" />
       <Heading title="SELAMAT DATANG DI DASHBOARD ADMIN" subTitle="Dashboard"/>
-      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
+      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(21rem,1fr))]">
         {overviewItems.map(({ title, number, icon, color }, index) => (
           <DashboardOverview key={index} title={title} number={number} icon={icon} color={color} />
         ))}
@@ -87,7 +87,7 @@ export default function Index({ overviewData, initialChartData }) {
             ))}
           </select>
         </div>
-        <InvoiceChart data={chartData} />
+        <InvoiceChart chartData={chartData} />
       </div>
     </DashboardLayout>
   );

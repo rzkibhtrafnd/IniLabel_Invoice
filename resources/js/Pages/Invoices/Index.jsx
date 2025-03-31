@@ -14,6 +14,7 @@ import Pagination from "../../Components/Tables/Pagination";
 import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 
 export default function Invoice({ invoices }) {
+  const url = window.location.origin + '/invoices';
   const { get, delete: destroy } = useForm();
 
   function onDetailInvoice(id) {
@@ -86,7 +87,7 @@ export default function Invoice({ invoices }) {
               ))}
             </tbody>
           </Table>
-          <Pagination data={invoices} />
+          <Pagination data={invoices} url={url} />
         </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data invoice.</p>

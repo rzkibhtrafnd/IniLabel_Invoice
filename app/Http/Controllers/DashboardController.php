@@ -29,7 +29,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    // API endpoint untuk mengambil data chart berdasarkan bulan
     public function getChartData(Request $request)
     {
         $month = $request->input('month', now()->month);
@@ -49,7 +48,6 @@ class DashboardController extends Controller
         return response()->json($data);
     }
 
-    // Method privat untuk mendapatkan data chart awal berdasarkan bulan
     private function getChartDataForMonth($month)
     {
         $year = now()->year;

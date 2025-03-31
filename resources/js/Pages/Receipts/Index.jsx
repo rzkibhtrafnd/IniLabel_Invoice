@@ -13,6 +13,7 @@ import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 import formatToRupiah from "../../utils/formatToRupiah";
 
 export default function Receipts({ receipts }) {
+  const url = window.location.origin + '/receipts';
   const { get, delete: destroy } = useForm();
 
   function onDetailReceipt(id) {
@@ -82,7 +83,7 @@ export default function Receipts({ receipts }) {
               ))}
             </tbody>
           </Table>
-          <Pagination data={receipts} />
+          <Pagination data={receipts} url={url} />
         </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data receipts.</p>

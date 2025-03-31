@@ -17,6 +17,7 @@ import FormPopup from "../../Components/Popup/FormPopup";
 import DetailPopup from "../../Components/Popup/DetailPopup";
 
 export default function Index({ products = [] }) {
+  const url = window.location.origin + '/products';
   const [ isFormOpen, openFormPopup, closeFormPopup ] = usePopup();
   const [ isDetailOpen, openDetailPopup, closeDetailPopup ] = usePopup();
   
@@ -102,7 +103,7 @@ export default function Index({ products = [] }) {
               ))}
             </tbody>
           </Table>
-          <Pagination data={products} />
+          <Pagination data={products} url={url} />
         </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data produk.</p>

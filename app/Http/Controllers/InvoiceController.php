@@ -24,6 +24,7 @@ class InvoiceController extends Controller
         
         return Inertia::render('Invoices/Index', [
             'invoices' => $invoices,
+            'appUrl' => env('APP_URL'),
         ]);
     }
 

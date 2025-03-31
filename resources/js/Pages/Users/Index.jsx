@@ -16,6 +16,7 @@ import FormPopup from "../../Components/Popup/FormPopup";
 import DetailPopup from "../../Components/Popup/DetailPopup";
 
 export default function Index({ users = [] }) {
+  const url = window.location.origin + '/users';
   const [ isFormOpen, openFormPopup, closeFormPopup ] = usePopup();
   const [ isDetailOpen, openDetailPopup, closeDetailPopup ] = usePopup();
   const { data, setData, reset, processing, post, put, delete: destroy } = useForm({
@@ -95,7 +96,7 @@ export default function Index({ users = [] }) {
               ))}
             </tbody>
           </Table>
-          <Pagination data={users} />
+          <Pagination data={users} url={url} />
         </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data user.</p>

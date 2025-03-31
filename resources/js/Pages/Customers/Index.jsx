@@ -16,6 +16,7 @@ import FormPopup from "../../Components/Popup/FormPopup";
 import DetailPopup from "../../Components/Popup/DetailPopup";
 
 export default function Index({ customers = [] }) {
+  const url = window.location.origin + '/customers';
   const [isFormOpen, openFormPopup, closeFormPopup] = usePopup();
   const [isDetailOpen, openDetailPopup, closeDetailPopup] = usePopup();
   const [mode, setMode] = useState("Tambah");
@@ -97,7 +98,7 @@ export default function Index({ customers = [] }) {
               ))}
             </tbody>
           </Table>
-          <Pagination data={customers} />
+          <Pagination data={customers} url={url} />
         </>
       ) : (
         <p className="text-center text-gray-500 mt-4">Tidak ada data customer.</p>

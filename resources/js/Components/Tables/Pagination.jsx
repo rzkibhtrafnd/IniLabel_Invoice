@@ -1,7 +1,7 @@
 import { router } from "@inertiajs/react";
 import { IoChevronBackOutline, IoChevronForwardSharp } from "react-icons/io5";
 
-export default function Pagination({ data }) {
+export default function Pagination({ data, url }) {
   if (!data.links) return null;
 
   const currentPage = data.current_page;
@@ -10,40 +10,38 @@ export default function Pagination({ data }) {
 
   function getDisplayedPages() {
     let pages = [];
-
-    if (lastPage <= visiblePages + 1) {
+    if (lastPage <= visiblePages + 2) {
       pages = data.links.slice(1, -1);
     } else {
-      pages.push(data.links[1]);
-
+      pages.push({ label: 1, url: `${url}?page=1`, active: currentPage === 1 });
+      
       if (currentPage > 3) {
         pages.push({ label: "...", url: null });
       }
-
-      let start = Math.max(2, currentPage);
+      
+      let start = Math.max(2, currentPage - 1);
       let end = Math.min(lastPage - 1, currentPage + 1);
-
+      
       if (currentPage <= 3) {
         start = 2;
         end = visiblePages;
       }
-
+      
       if (currentPage >= lastPage - 2) {
         start = lastPage - visiblePages + 1;
         end = lastPage - 1;
       }
-
+      
       for (let i = start; i <= end; i++) {
-        pages.push(data.links[i]);
+        pages.push({ label: i, url: `${url}?page=${i}`, active: i === currentPage });
       }
-
+      
       if (currentPage < lastPage - 2) {
         pages.push({ label: "...", url: null });
       }
-
-      pages.push(data.links[lastPage]);
+      
+      pages.push({ label: lastPage, url: `${url}?page=${lastPage}`, active: currentPage === lastPage });
     }
-
     return pages;
   }
 
@@ -52,10 +50,8 @@ export default function Pagination({ data }) {
   return (
     <div className="flex justify-center space-x-1">
       <button
-        onClick={() => router.visit(data.prev_page_url)}
-        className={`px-3 py-1 text-[#4D4FED] ${
-          !data.prev_page_url ? "opacity-50 cursor-default" : "cursor-pointer"
-        }`}
+        onClick={() => data.prev_page_url && router.visit(data.prev_page_url)}
+        className={`px-3 py-1 text-[#4D4FED] ${!data.prev_page_url ? "opacity-50 cursor-default" : "cursor-pointer"}`}
         disabled={!data.prev_page_url}
       >
         <IoChevronBackOutline size={24} />
@@ -66,18 +62,14 @@ export default function Pagination({ data }) {
           key={index}
           onClick={() => link.url && router.visit(link.url)}
           dangerouslySetInnerHTML={{ __html: link.label }}
-          className={`px-3 text-[#4D4FED] text-base py-1 rounded-full ${
-            link.active ? "bg-[#4D4FED] text-white" : ""
-          } ${!link.url ? "cursor-default" : "cursor-pointer"}`}
+          className={`px-3 text-[#4D4FED] text-base py-1 rounded-full ${link.active ? "bg-[#4D4FED] text-white" : ""} ${!link.url ? "cursor-default" : "cursor-pointer"}`}
           disabled={!link.url}
         />
       ))}
 
       <button
-        onClick={() => router.visit(data.next_page_url)}
-        className={`px-3 py-1 text-[#4D4FED] ${
-          !data.next_page_url ? "opacity-50 cursor-default" : "cursor-pointer"
-        }`}
+        onClick={() => data.next_page_url && router.visit(data.next_page_url)}
+        className={`px-3 py-1 text-[#4D4FED] ${!data.next_page_url ? "opacity-50 cursor-default" : "cursor-pointer"}`}
         disabled={!data.next_page_url}
       >
         <IoChevronForwardSharp size={24} />
