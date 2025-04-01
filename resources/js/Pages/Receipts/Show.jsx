@@ -89,13 +89,11 @@ export default function ShowReceipt({ receipt }) {
           </div>
           {receipt.bukti_pembayaran && (
             <div className="flex flex-col gap-2">
-              <label className="font-semibold text-gray-600">
-                Bukti Pembayaran
-              </label>
+              <label className="font-semibold text-gray-600">Bukti Pembayaran</label>
               <img
-                src={receipt.bukti_pembayaran}
+                src={`/storage/${receipt.bukti_pembayaran}`} // Tambahkan /storage/
                 alt="Bukti Pembayaran"
-                className="border border-gray-300 rounded-[10px] max-w-full"
+                className="border border-gray-300 rounded-[10px] max-w-[200px] h-auto"
               />
             </div>
           )}

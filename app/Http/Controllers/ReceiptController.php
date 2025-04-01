@@ -51,40 +51,35 @@ class ReceiptController extends Controller
     {
         $request->validate([
             'invoice_id'        => 'required|exists:invoices,id',
-            'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
+            'metode_pembayaran' => 'required|in:Tunai,Transfer',
             'jumlah_bayar'      => 'required|numeric|min:0',
             'tanggal_bayar'     => 'required|date',
             'bukti_pembayaran'  => $request->metode_pembayaran === 'Tunai' ? 'nullable' : 'required|image',
             'status'            => 'required|in:Dibayar Sebagian,Lunas',
         ]);
-    
+
         $invoice = Invoice::findOrFail($request->invoice_id);
-    
         if ($invoice->status === 'Dibatalkan') {
             return redirect()->back()->withErrors(['invoice_id' => 'Invoice telah dibatalkan!']);
         }
-    
+
         $data = $request->only([
-            'invoice_id',
-            'metode_pembayaran',
-            'jumlah_bayar',
-            'tanggal_bayar',
-            'status',
+            'invoice_id', 'metode_pembayaran', 'jumlah_bayar', 'tanggal_bayar', 'status'
         ]);
-    
         $data['user_id'] = Auth::id();
-    
-        if ($request->hasFile('bukti_pembayaran')) {
-            $data['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti_pembayaran');
+        
+        if ($request->metode_pembayaran !== 'Tunai' && $request->hasFile('bukti_pembayaran')) {
+            $data['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
+        } else {
+            $data['bukti_pembayaran'] = null;
         }
-    
+
         $receipt = Receipts::create($data);
-    
-        // Update invoice
+
         $invoice->total_dibayar += $receipt->jumlah_bayar;
         $invoice->status = $this->hitungStatusInvoice($invoice);
         $invoice->save();
-    
+
         return redirect()->route('receipts.show', $receipt->id);
     }
 
@@ -120,7 +115,7 @@ class ReceiptController extends Controller
     {
         $request->validate([
             'invoice_id'        => 'required|exists:invoices,id',
-            'metode_pembayaran' => 'required|in:Tunai,Transfer,Virtual Account',
+            'metode_pembayaran' => 'required|in:Tunai,Transfer',
             'jumlah_bayar'      => 'required|numeric|min:0',
             'tanggal_bayar'     => 'required|date',
             'bukti_pembayaran'  => $request->metode_pembayaran === 'Tunai' ? 'nullable' : 'nullable|image',
