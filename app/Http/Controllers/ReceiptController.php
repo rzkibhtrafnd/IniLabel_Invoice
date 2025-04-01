@@ -22,9 +22,10 @@ class ReceiptController extends Controller
     public function index()
     {
         $receipts = Receipts::with(['invoice', 'user'])
+            ->where('user_id', Auth::id())
             ->latest()
             ->paginate(15);
-
+    
         return Inertia::render('Receipts/Index', [
             'receipts' => $receipts,
         ]);
@@ -35,7 +36,9 @@ class ReceiptController extends Controller
      */
     public function create()
     {
-        $invoices = Invoice::where('status', '!=', 'Dibatalkan')->get(['id', 'total_bayar']);
+        $invoices = Invoice::where('status', '!=', 'Dibatalkan')
+        ->where('user_id', Auth::id())
+        ->get(['id', 'total_bayar']);    
         return Inertia::render('Receipts/Create', [
             'invoices' => $invoices,
         ]);
@@ -101,7 +104,9 @@ class ReceiptController extends Controller
      */
     public function edit(Receipts $receipt)
     {
-        $invoices = Invoice::where('status', '!=', 'Dibatalkan')->get(['id', 'total_bayar']);
+        $invoices = Invoice::where('status', '!=', 'Dibatalkan')
+        ->where('user_id', Auth::id())
+        ->get(['id', 'total_bayar']); 
         return Inertia::render('Receipts/Edit', [
             'receipt'  => $receipt,
             'invoices' => $invoices,

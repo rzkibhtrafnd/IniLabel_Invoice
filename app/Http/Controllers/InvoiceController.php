@@ -19,6 +19,7 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::with(['customer', 'user'])
+            ->where('user_id', Auth::id())
             ->latest()
             ->paginate(15);
         

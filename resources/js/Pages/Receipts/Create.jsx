@@ -67,7 +67,6 @@ export default function CreateReceipt({ invoices = [] }) {
               >
                 <option value="Tunai">Tunai</option>
                 <option value="Transfer">Transfer</option>
-                <option value="Virtual Account">Virtual Account</option>
               </select>
               {errors.metode_pembayaran && (
                 <span className="text-red-500 text-sm">
