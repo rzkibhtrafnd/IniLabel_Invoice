@@ -11,7 +11,7 @@ import formatToRupiah from "../../utils/formatToRupiah";
 
 function DashboardOverview({ title, number, icon: Icon, color }) {
   return (
-    <div className="flex items-center justify-between gap-4 p-5 bg-white shadow shadow-[6px_6px_54px_rgba(0,0,0,0.05)] rounded-2xl">
+    <div className="flex items-center justify-between gap-4 p-5 bg-white shadow-[6px_6px_54px_rgba(0,0,0,0.05)] rounded-2xl">
       <div className="flex flex-col gap-1">
         <p className="text-[#20222470] font-semibold text-base">{title}</p>
         <p className="text-2xl font-bold">{number}</p>
@@ -72,7 +72,7 @@ export default function Index({ overviewData, initialChartData }) {
           <DashboardOverview key={index} title={title} number={number} icon={icon} color={color} />
         ))}
       </div>
-      <div className="bg-white flex flex-col space-y-3 rounded-xl p-10 shadow shadow-[6px_6px_54px_rgba(0,0,0,0.05)] mt-6">
+      <div className="bg-white flex flex-col space-y-3 rounded-xl p-10 shadow-[6px_6px_54px_rgba(0,0,0,0.05)] mt-6">
         <div className="flex justify-between px-[25px] items-center">
           <h2 className="text-[#202224] text-2xl font-semibold leading-9">Invoice Details</h2>
           <select 
