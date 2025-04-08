@@ -9,15 +9,13 @@ use Inertia\Response;
 
 class AuthController extends Controller
 {
-    public function index(): Response
+    public function index()
     {
         if (!Auth::check()) {
             return Inertia::render('Auth/Login');
         }
 
-        return Inertia::render('Dashboard/Index', [
-            'canManageUser' => Auth::user()->can('manage-user')
-        ]);
+        return redirect()->route('dashboard');
     }
 
     public function login(Request $request)
