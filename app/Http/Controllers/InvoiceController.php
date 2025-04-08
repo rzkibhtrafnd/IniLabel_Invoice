@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\InvoiceEmail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoiceNotificationEmail;
 
 class InvoiceController extends Controller
 {
@@ -221,7 +222,7 @@ class InvoiceController extends Controller
     
         // Kirim notifikasi email ke user yang membuat invoice
         Mail::to($invoice->user->email)->send(
-            new \App\Mail\InvoiceNotificationEmail($invoice, $pdfContent, $setting)
+            new InvoiceNotificationEmail($invoice, $pdfContent, $setting)
         );
     
         return redirect()->back()->with('message', 'Success.Email invoice telah dikirim ke customer dan notifikasi telah dikirim ke user.');

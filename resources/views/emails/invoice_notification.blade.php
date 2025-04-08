@@ -99,14 +99,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td align="center">
-                            <p style="font-family: Arial, sans-serif; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                Jika ada pertanyaan, silakan hubungi:<br>
-                                📞 {{ $invoice->user->notelepon }}
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
                         <td align="center" style="font-family: Arial, sans-serif; font-size: 14px; color: #888; padding-top: 10px; border-top: 1px solid #ddd;">
                             <p>Salam, <br><strong>{{ $setting->company_name ?? 'Perusahaan Anda' }} Customer Support</strong></p>
                         </td>

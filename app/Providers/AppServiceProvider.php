@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Setting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
     
         Inertia::share([
             'canManageUser' => fn () => request()->canManageUser(),
+        ]);
+        
+        Inertia::share([
+            'setting' => function () {
+                return Setting::first();
+            },
         ]);
     }
 }

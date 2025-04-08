@@ -43,7 +43,7 @@ export default function CreateReceipt({ invoices = [] }) {
               <option value="">Pilih Invoice</option>
               {invoices.map((invoice) => (
                 <option key={invoice.id} value={invoice.id}>
-                  {invoice.id} - {formatToRupiah(invoice.total_bayar)}
+                  {invoice.id} - {invoice.customer?.name} - {formatToRupiah(invoice.total_bayar)} - {new Date(invoice.updated_at).toLocaleDateString("id-ID")}
                 </option>
               ))}
             </select>

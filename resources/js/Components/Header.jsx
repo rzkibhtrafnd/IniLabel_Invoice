@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
 import { usePage, Link, useForm } from "@inertiajs/react";
 import { FaBars } from "react-icons/fa";
-import { RxDashboard } from "react-icons/rx";
-import { IoBagRemoveOutline, IoLogOutOutline, IoSettingsOutline } from "react-icons/io5";
-import { HiOutlineUserGroup, HiOutlineUserCircle } from "react-icons/hi2";
+import {
+  RxDashboard
+} from "react-icons/rx";
+import {
+  IoBagRemoveOutline,
+  IoLogOutOutline,
+  IoSettingsOutline
+} from "react-icons/io5";
+import {
+  HiOutlineUserGroup,
+  HiOutlineUserCircle
+} from "react-icons/hi2";
 import { PiInvoice } from "react-icons/pi";
 import { TfiReceipt } from "react-icons/tfi";
-import logo from "../../assets/logo.png";
 
 function MenuItem({ href, icon: Icon, label, isActive }) {
   return (
@@ -25,7 +33,7 @@ function MenuItem({ href, icon: Icon, label, isActive }) {
 }
 
 export default function Header() {
-  const { canManageUser } = usePage().props;
+  const { canManageUser, setting } = usePage().props;
   const { component, url } = usePage();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,7 +50,6 @@ export default function Header() {
         closeMenu();
       }
     };
-
     document.addEventListener("click", handleOutsideClick);
     return () => document.removeEventListener("click", handleOutsideClick);
   }, [isOpen]);
@@ -64,6 +71,10 @@ export default function Header() {
     { href: "/settings", icon: IoSettingsOutline, label: "Setting", isShow: true, componentName: "Settings" },
   ];
 
+  const currentYear = new Date().getFullYear();
+  const logoUrl = setting?.logo ? `/storage/${setting.logo}` : null;
+  const companyName = setting?.company_name || "Perusahaan";
+
   return (
     <header className="sticky md:h-[calc(100vh-1rem)] p-4 top-0 left-0 flex bg-white">
       <button onClick={toggleMenu} className="md:hidden text-[#0569A0] cursor-pointer">
@@ -76,11 +87,17 @@ export default function Header() {
         } md:left-0`}
       >
         <nav className="flex flex-col gap-8 w-fit bg-white h-[calc(100vh)] p-[1rem]">
-          <img src={logo} alt="Logo" className="px-4" width={180} height={180} />
+          {logoUrl && <img src={logoUrl} alt="Logo" className="px-4" width={180} height={180} />}
           <ul className="flex flex-col gap-2">
             {menuItems.map(({ href, icon, label, isShow, componentName }) =>
               isShow ? (
-                <MenuItem key={href} href={href} icon={icon} label={label} isActive={component.includes(componentName)} />
+                <MenuItem
+                  key={href}
+                  href={href}
+                  icon={icon}
+                  label={label}
+                  isActive={component.includes(componentName)}
+                />
               ) : null
             )}
             <li>
@@ -96,7 +113,9 @@ export default function Header() {
               </Link>
             </li>
           </ul>
-          <p className="text-center mt-auto text-sm">&copy;2025 IniLabel</p>
+          <p className="text-center mt-auto text-sm">
+            &copy;{currentYear} {companyName}
+          </p>
         </nav>
       </aside>
     </header>

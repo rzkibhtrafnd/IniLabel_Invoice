@@ -36,9 +36,11 @@ class ReceiptController extends Controller
      */
     public function create()
     {
-        $invoices = Invoice::where('status', '!=', 'Dibatalkan')
-        ->where('user_id', Auth::id())
-        ->get(['id', 'total_bayar']);    
+        $invoices = Invoice::with('customer')
+            ->where('status', '!=', 'Dibatalkan')
+            ->where('user_id', Auth::id())
+            ->get(['id', 'customer_id', 'total_bayar', 'updated_at']);
+    
         return Inertia::render('Receipts/Create', [
             'invoices' => $invoices,
         ]);
@@ -240,11 +242,11 @@ class ReceiptController extends Controller
         $pdfContent = $pdf->output();
 
         $customerEmail = $receipt->invoice->customer->email ?? 'default@example.com';
-        Mail::to($customerEmail)->send(new ReceiptEmail($receipt, $pdfContent));
+        Mail::to($customerEmail)->send(new ReceiptEmail($receipt, $pdfContent, $setting));
 
         $kasirEmail = $receipt->user->email;
         Mail::to($kasirEmail)->send(new ReceiptNotificationEmail($receipt, $pdfContent, $setting));
 
-        return redirect()->back()->with('message', 'Succes.Receipt telah dikirim ke ' . $customerEmail);
+        return redirect()->back()->with('message', 'Success.Receipt telah dikirim ke ' . $customerEmail);
     }
 }

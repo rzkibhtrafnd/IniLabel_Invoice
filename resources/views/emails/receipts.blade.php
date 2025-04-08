@@ -57,6 +57,12 @@
       color: #007bff;
       text-decoration: none;
     }
+    @media screen and (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -65,26 +71,29 @@
       <td align="center">
         <div class="container">
           <div class="header">
-            <img src="{{ asset('assets/logo.png') }}" alt="Logo">
-            <h2>Receipt #{{ $receipt->id }}</h2>
+            @if(isset($setting->logo))
+              <img src="{{ $imageSrc ?? asset('storage/'.$setting->logo) }}" alt="{{ $setting->company_name }} Logo">
+            @else
+              <img src="{{ asset('assets/logo.png') }}" alt="Default Logo">
+            @endif
+            <h2>Receipt RCP-00{{ $receipt->id }}</h2>
           </div>
           <div class="content">
             <p>Halo <strong>{{ $receipt->invoice->customer->name }}</strong>,</p>
-            <p>Kami telah menerima pembayaran Anda. Terima kasih atas kepercayaan yang Anda berikan kepada kami.</p>
+            <p>Kami telah menerima pembayaran Anda. Terima kasih atas kepercayaan yang telah Anda berikan kepada kami.</p>
           </div>
           <div class="message-box">
             <p>Jumlah Pembayaran: <strong>Rp {{ number_format($receipt->jumlah_bayar, 0, ',', '.') }}</strong></p>
-            <p>Status Pembayaran: <strong>{{$receipt->status}}</strong></p>
+            <p>Status Pembayaran: <strong>{{ $receipt->status }}</strong></p>
             <p>Tanggal Pembayaran: <strong>{{ date('d F Y', strtotime($receipt->tanggal_bayar)) }}</strong></p>
           </div>
           <div class="content">
             <p>Kami lampirkan receipt (struk pembayaran) dalam format PDF sebagai bukti transaksi Anda.</p>
-            <p>Jika ada pertanyaan atau informasi lebih lanjut, jangan ragu untuk menghubungi {{$receipt->user->notelepon}}</p>
-            <p>Salam hangat,</p>
-            <p><strong>Tim {{$setting->company_name}}</strong></p>
+            <p>Jika ada pertanyaan atau informasi lebih lanjut, jangan ragu untuk menghubungi kami di kontak dibawah ini:</p>
+            <p>☎️ {{ $receipt->user->notelepon }} | 📧 {{ $receipt->user->email }}</p>
           </div>
           <div class="footer">
-            <p>☎️ {{ $receipt->user->notelepon }} | 📧 {{ $receipt->user->email }}</p>
+            <p>Salam, <br><strong>{{ $setting->company_name ?? 'Nama Perusahaan' }} Customer Support</strong></p>
           </div>
         </div>
       </td>

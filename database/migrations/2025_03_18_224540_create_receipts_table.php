@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['Dibayar Sebagian', 'Lunas']);
             $table->decimal('jumlah_bayar', 10, 2);
             $table->date('tanggal_bayar');
-            $table->string('bukti_pembayaran');
+            $table->string('bukti_pembayaran')->nullable;
             $table->timestamps();
         });
     }
