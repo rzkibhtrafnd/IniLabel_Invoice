@@ -113,7 +113,7 @@ export default function Header() {
               </Link>
             </li>
           </ul>
-          <p className="text-center mt-auto text-sm">
+          <p className="text-center mt-auto text-sm pb-4">
             &copy;{currentYear} {companyName}
           </p>
         </nav>

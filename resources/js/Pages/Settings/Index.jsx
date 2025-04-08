@@ -67,11 +67,11 @@ function ImageUpload({ label, id, data, setData, width = "max-w-[20rem]", backgr
             >
               <RiDeleteBinLine size={20} />
             </button>
-            <div className="relative w-full">
+            <div className="relative w-full flex justify-center">
               <img
                 src={preview}
                 alt="Preview"
-                className="h-auto w-full object-cover rounded"
+                className="h-auto w-full max-w-3xs object-cover rounded"
               />
             </div>
           </>

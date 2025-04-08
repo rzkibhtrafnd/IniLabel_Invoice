@@ -11,6 +11,7 @@ import TableData from "../../Components/Tables/TableData";
 import Pagination from "../../Components/Tables/Pagination";
 import ConfirmPopup from "../../Components/Popup/ConfirmPopup";
 import formatToRupiah from "../../utils/formatToRupiah";
+import Status from "../../Components/Status";
 
 export default function Receipts({ receipts }) {
   const url = window.location.origin + '/receipts';
@@ -52,7 +53,11 @@ export default function Receipts({ receipts }) {
                   <TableData>{index + 1}</TableData>
                   <TableData>{receipt.invoice_id}</TableData>
                   <TableData>{receipt.metode_pembayaran}</TableData>
-                  <TableData>{receipt.status}</TableData>
+                  <TableData>
+                    <Status>
+                      {receipt.status}
+                    </Status>
+                  </TableData>
                   <TableData>{formatToRupiah(receipt.jumlah_bayar)}</TableData>
                   <TableData className="px-1 w-[111px]">
                     <Button

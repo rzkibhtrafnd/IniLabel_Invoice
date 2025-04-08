@@ -1,12 +1,11 @@
-import { Head, useForm } from "@inertiajs/react";
-import logo from "../../../assets/logo.png";
-import Swal from "sweetalert2";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import Button from "../../Components/Buttons";
 import Input from "../../Components/Input";
-import { useEffect } from "react";
 import FlashMessage from "../../Components/FlashMessage";
 
-export default function Login({ flash }) {
+export default function Login() {
+  const { setting } = usePage().props;
+  const logoUrl = setting?.logo ? `/storage/${setting.logo}` : null;
   const { data, setData, post, processing } = useForm({
     email: "",
     password: "",
@@ -26,12 +25,7 @@ export default function Login({ flash }) {
       <FlashMessage />
       <Head title="Login" />
       <div className="w-full gap-4 flex flex-col bg-[#F6F6F6] border border-[#5882C1] max-w-md p-10 rounded-lg">
-        <img
-          src={logo}
-          alt="Logo"
-          className="mx-auto"
-          width={180} height={180}
-        />
+        {logoUrl && <img src={logoUrl} alt="Logo" className="mx-auto" width={180} />}
         <h1 className="text-2xl font-bold mb-4">
           Login
         </h1>

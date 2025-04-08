@@ -15,6 +15,12 @@ export default function CreateReceipt({ invoices = [] }) {
 
   const handleCreateReceipt = (e) => {
     e.preventDefault();
+
+    if (data.metode_pembayaran === "Transfer" && !data.bukti_pembayaran) {
+      alert("Bukti pembayaran wajib diunggah jika metode pembayaran adalah Transfer.");
+      return;
+    }
+
     post("/receipts");
   };
 
@@ -133,6 +139,11 @@ export default function CreateReceipt({ invoices = [] }) {
             <label className="font-semibold text-[#646262]">
               Bukti Pembayaran
             </label>
+            
+            <div className="text-yellow-600 text-sm font-medium bg-yellow-100 border border-yellow-300 p-2 rounded-md">
+              Bukti pembayaran wajib diunggah jika menggunakan metode <strong>Transfer</strong>.
+            </div>
+
             <input
               type="file"
               className="w-full p-2 border rounded-[10px]"

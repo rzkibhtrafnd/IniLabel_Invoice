@@ -229,7 +229,7 @@ export default function CreateInvoice({ products = [], customers = [], taxPercen
               </tbody>
             </table>
           </div>
-          <button onClick={addItem} className="flex items-center gap-2 w-fit text-[#4D4FED] font-bold underline">
+          <button type="button" onClick={addItem} className="flex items-center gap-2 w-fit text-[#4D4FED] font-bold underline cursor-pointer">
             <CiSquarePlus size={24} /> Tambah Item
           </button>
         </div>

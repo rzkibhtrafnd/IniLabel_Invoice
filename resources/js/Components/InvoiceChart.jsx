@@ -4,11 +4,12 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
 
 export default function InvoiceChart({ chartData }) {
+  console.log(chartData);
   const labels = chartData.map((data) => data.date);
   const totalInvoices = chartData.map((data) => data.total_invoices);
 
   const data = {
-    labels: Array.from({ length: chartData.length }, (_, i) => i),
+    labels: labels,
     datasets: [
       {
         label: "Total Invoices",
