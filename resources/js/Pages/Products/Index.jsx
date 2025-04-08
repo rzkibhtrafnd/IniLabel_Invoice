@@ -22,7 +22,7 @@ export default function Index({ products = [] }) {
   const [ isDetailOpen, openDetailPopup, closeDetailPopup ] = usePopup();
   
   const { data, setData, reset, post, put, delete: destroy } = useForm({
-    id: "", name: "", description: "", price: "", stock: "",
+    id: "", name: "", description: "", price: "", stock: "", unit: ""
   });
   const [mode, setMode] = useState("Tambah");
 
@@ -120,7 +120,8 @@ export default function Index({ products = [] }) {
             { id: "name", type: "text", placeholder: "Nama Produk", required: true },
             { id: "description", type: "text", placeholder: "Deskripsi Produk", required: true },
             { id: "price", type: "number", placeholder: "Harga", required: true },
-            { id: "stock", type: "number", placeholder: "Stok", required: true }
+            { id: "stock", type: "number", placeholder: "Stok", required: true },
+            { id: "unit", type: "text", placeholder: "Satuan", required: true }
           ]}
         />
       )}
@@ -134,7 +135,8 @@ export default function Index({ products = [] }) {
             { id: "name", placeholder: "Nama Produk" },
             { id: "description", placeholder: "Deskripsi Produk" },
             { id: "price", placeholder: "Harga" },
-            { id: "stock", placeholder: "Stok" }
+            { id: "stock", placeholder: "Stok" },
+            { id: "unit", placeholder: "Satuan" }
           ]}
         />
       )}

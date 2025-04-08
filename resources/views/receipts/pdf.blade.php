@@ -104,6 +104,7 @@
       <thead>
         <tr>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: start; padding: 10px; width: 100%;">Item</th>
+          <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Satuan</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Jumlah</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Harga</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Total</th>
@@ -114,6 +115,9 @@
           <tr>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: start; padding: 10px; width: 100%;">
               {{ $item->product->name }}
+            </td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">
+              {{ $item->product->unit }}
             </td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">
               {{ $item->kuantitas }}

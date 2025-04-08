@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function index()
     {
         return Inertia::render('Products/Index', [
-            'products' => Product::select(['id', 'name', 'description', 'price', 'stock'])
+            'products' => Product::select(['id', 'name', 'description', 'price', 'stock', 'unit'])
                 ->latest()
                 ->paginate(15)
         ]);
@@ -25,6 +25,7 @@ class ProductController extends Controller
             'description' => 'required|string|max:255',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
+            'unit' => 'required|string|max:50',
         ]);
 
         Product::create($validated);
@@ -39,6 +40,7 @@ class ProductController extends Controller
             'description' => 'required|string|max:255',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
+            'unit' => 'required|string|max:50',
         ]);
 
         $product->update($validated);

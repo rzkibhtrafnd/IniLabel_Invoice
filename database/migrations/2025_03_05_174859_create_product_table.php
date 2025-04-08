@@ -8,19 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) { // Ubah ke bentuk plural
-            $table->engine = 'InnoDB'; // Tambahkan ini
+        Schema::create('products', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->string('name');
             $table->string('description');
             $table->decimal('price', 10, 2);
             $table->integer('stock');
+            $table->string('unit');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('products'); // Sesuaikan dengan nama tabel
+        Schema::dropIfExists('products');
     }
 };

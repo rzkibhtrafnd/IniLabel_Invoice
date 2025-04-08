@@ -13,6 +13,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'unit',
     ];
 
     public function details()

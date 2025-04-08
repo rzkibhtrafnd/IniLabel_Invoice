@@ -79,6 +79,7 @@
       <thead>
         <tr>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: start; padding: 10px; width: 100%;">Item</th>
+          <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Satuan</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Jumlah</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Harga</th>
           <th style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">Total</th>
@@ -88,6 +89,7 @@
         @foreach($invoice->details as $item)
           <tr>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: start; padding: 10px; width: 100%;">{{ $item->product->name }}</td>
+            <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ $item->product->unit }}</td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ $item->kuantitas }}</td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ number_format($item->harga, 0, ',', '.') }}</td>
             <td style="border-bottom: 1px solid #DFE4EA; font-size: 10px; text-align: center; padding: 10px 20px;">{{ number_format($item->total_harga, 0, ',', '.') }}</td>
