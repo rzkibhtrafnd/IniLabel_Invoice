@@ -65,10 +65,10 @@ export default function Header() {
     { href: "/dashboard", icon: RxDashboard, label: "Dashboard", isShow: true, componentName: "Dashboard" },
     { href: "/users", icon: HiOutlineUserCircle, label: "User", isShow: canManageUser, componentName: "Users" },
     { href: "/customers", icon: HiOutlineUserGroup, label: "Customer", isShow: true, componentName: "Customers" },
-    { href: "/products", icon: IoBagRemoveOutline, label: "Produk", isShow: true, componentName: "Products" },
+    { href: "/products", icon: IoBagRemoveOutline, label: "Produk", isShow: canManageUser, componentName: "Products" },
     { href: "/invoices", icon: PiInvoice, label: "Invoice", isShow: true, componentName: "Invoices" },
     { href: "/receipts", icon: TfiReceipt, label: "Receipt", isShow: true, componentName: "Receipts" },
-    { href: "/settings", icon: IoSettingsOutline, label: "Setting", isShow: true, componentName: "Settings" },
+    { href: "/settings", icon: IoSettingsOutline, label: "Setting", isShow: canManageUser, componentName: "Settings" },
   ];
 
   const currentYear = new Date().getFullYear();
