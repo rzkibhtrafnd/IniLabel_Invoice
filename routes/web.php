@@ -21,7 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', AdminController::class)->middleware('superadmin');
-    Route::resource('customers', CustomerController::class)->middleware('superadmin');
+    Route::resource('customers', CustomerController::class);
     Route::resource('products', ProductController::class);
     Route::resource('invoices', InvoiceController::class);
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadInvoice'])->name('invoices.download');

@@ -29,7 +29,7 @@
     <table class="table-header">
       <tr>
         <td>
-          <h2>PT. {{$setting->company_name}}</h2>
+          <h2>{{$setting->company_name}}</h2>
           <table>
             <tr>
               <th>No Invoice</th>

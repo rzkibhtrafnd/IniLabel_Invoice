@@ -59,21 +59,21 @@ class InvoiceController extends Controller
             'diskon'            => 'nullable|numeric|min:0',
             'ongkir'            => 'nullable|numeric|min:0',
         ]);
-
+    
         $setting = Setting::first();
         $taxPercentage = $setting ? $setting->tax : 0;
         $diskon = $request->diskon ?? 0;
         $ongkir = $request->ongkir ?? 0;
-
+    
         $subtotal = collect($request->items)->sum(function ($item) {
             $product = Product::find($item['produk_id']);
             return $item['kuantitas'] * $product->price;
         });
-
+    
         $baseForTax = $subtotal - $diskon + $ongkir;
         $taxValue   = round($baseForTax * ($taxPercentage / 100), 2);
         $total_bayar = $baseForTax + $taxValue;
-
+    
         $invoice = Invoice::create([
             'customer_id' => $request->customer_id,
             'user_id'     => Auth::id(),
@@ -86,7 +86,7 @@ class InvoiceController extends Controller
             'total_dibayar' => 0,
             'status'      => 'Draft',
         ]);
-
+    
         foreach ($request->items as $item) {
             $product = Product::find($item['produk_id']);
             $invoice->details()->create([
@@ -95,8 +95,11 @@ class InvoiceController extends Controller
                 'harga'       => $product->price,
                 'total_harga' => $item['kuantitas'] * $product->price,
             ]);
+    
+            // Kurangi stok produk
+            $product->decrement('stock', $item['kuantitas']);
         }
-
+    
         return redirect()->route('invoices.index')->with('message', 'Success.Invoice berhasil dibuat!');
     }
 
@@ -122,23 +125,29 @@ class InvoiceController extends Controller
             'diskon'            => 'nullable|numeric|min:0',
             'ongkir'            => 'nullable|numeric|min:0',
         ]);
-
+    
+        // Kembalikan stok produk sebelumnya
+        foreach ($invoice->details as $detail) {
+            $product = Product::find($detail->produk_id);
+            $product->increment('stock', $detail->kuantitas);
+        }
+    
         $invoice->details()->delete();
-
+    
         $setting = Setting::first();
         $taxPercentage = $setting ? $setting->tax : 0;
         $diskon = $request->diskon ?? 0;
         $ongkir = $request->ongkir ?? 0;
-
+    
         $subtotal = collect($request->items)->sum(function ($item) {
             $product = Product::find($item['produk_id']);
             return $item['kuantitas'] * $product->price;
         });
-
+    
         $baseForTax = $subtotal - $diskon + $ongkir;
         $taxValue   = round($baseForTax * ($taxPercentage / 100), 2);
         $total_bayar = $baseForTax + $taxValue;
-
+    
         $invoice->update([
             'customer_id' => $request->customer_id,
             'jatuh_tempo' => $request->jatuh_tempo,
@@ -148,7 +157,7 @@ class InvoiceController extends Controller
             'tax'         => $taxValue,
             'total_bayar' => $total_bayar,
         ]);
-
+    
         foreach ($request->items as $item) {
             $product = Product::find($item['produk_id']);
             $invoice->details()->create([
@@ -157,8 +166,11 @@ class InvoiceController extends Controller
                 'harga'       => $product->price,
                 'total_harga' => $item['kuantitas'] * $product->price,
             ]);
+    
+            // Kurangi stok produk
+            $product->decrement('stock', $item['kuantitas']);
         }
-
+    
         return redirect()->route('invoices.index')->with('message', 'Success.Invoice berhasil diperbarui!');
     }
 
